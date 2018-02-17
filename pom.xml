@@ -4,9 +4,91 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.gamechest</groupId>
-    <artifactId>backend</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>de.gamechest.backend</groupId>
+    <artifactId>backend-parent</artifactId>
+    <version>${service.version}-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
+    <organization>
+        <name>GameChest</name>
+        <url>https://game-chest.de</url>
+    </organization>
 
+    <properties>
+        <build.number>unknown</build.number>
+        <git.commit>unknown</git.commit>
+
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.targetEncoding>UTF-8</project.build.targetEncoding>
+        <service.version>1.0</service.version>
+    </properties>
+
+    <modules>
+        <module>database</module>
+        <module>updater</module>
+        <module>master</module>
+    </modules>
+
+    <repositories>
+        <repository>
+            <id>byte-repo</id>
+            <url>https://vs.bytelist.de/nexus/repository/byte-repo/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.12</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>byte-repo</id>
+            <url>https://vs.bytelist.de/nexus/repository/byte-repo/</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.1</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.5.1</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <serverId>byte-repo</serverId>
+                    <nexusUrl>https://vs.bytelist.de/nexus/</nexusUrl>
+                    <skipStaging>true</skipStaging>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
