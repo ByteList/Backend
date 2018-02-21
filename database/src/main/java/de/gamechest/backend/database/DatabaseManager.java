@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static de.gamechest.backend.database.settings.DatabaseSettingsObject.BACKEND_STARTED;
+import static de.gamechest.backend.database.settings.DatabaseSettingsObject.BACKEND_VERSION;
 
 /**
  * Created by ByteList on 09.04.2017.
@@ -64,7 +65,6 @@ public class DatabaseManager {
             this.mongoClient = new MongoClient(new ServerAddress(host, port), Collections.singletonList(MongoCredential.createCredential(username, database, password.toCharArray())), options);
         else
             this.mongoClient = new MongoClient(new ServerAddress(host, port), options);
-        System.out.println(database);
         this.mongoDatabase = this.mongoClient.getDatabase(database);
 
         this.async = new AsyncDatabaseManager(this);
@@ -84,6 +84,8 @@ public class DatabaseManager {
             SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
             String started = formatter.format(now.getTime());
             dbSettings.setDatabaseObject(BACKEND_STARTED, started);
+
+            dbSettings.setDatabaseObject(BACKEND_VERSION, backendVersion);
         });
     }
 

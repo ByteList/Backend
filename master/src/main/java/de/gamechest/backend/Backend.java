@@ -103,7 +103,6 @@ public class Backend {
         backendDocument = Document.loadDocument(backendFile);
         backendUid = backendDocument.getString("BACKEND_UID");
         try {
-            System.out.println(backendDocument.getString("db-database"));
             this.databaseManager = new DatabaseManager(backendUid, version, backendDocument.getString("db-host"), backendDocument.getInt("db-port"),
                     backendDocument.getString("db-user"), backendDocument.getString("db-password"), backendDocument.getString("db-database"));
             this.databaseManager.init();
