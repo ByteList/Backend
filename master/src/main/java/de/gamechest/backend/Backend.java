@@ -8,6 +8,7 @@ import de.gamechest.backend.database.DatabaseManager;
 import de.gamechest.backend.log.BackendLogger;
 import de.gamechest.backend.log.LoggingOutPutStream;
 import de.gamechest.backend.setup.Setup;
+import de.gamechest.backend.updater.Updater;
 import de.gamechest.backend.web.WebService;
 import jline.console.ConsoleReader;
 import lombok.Getter;
@@ -56,6 +57,8 @@ public class Backend {
     private boolean inSetUp;
     @Getter
     private WebService webService;
+    @Getter
+    private Updater updater;
 
     private String stopDate;
 
@@ -95,6 +98,7 @@ public class Backend {
             }
         }
 
+        this.updater = new Updater(version, logger);
 
         backendDocument = Document.loadDocument(backendFile);
         backendUid = backendDocument.getString("BACKEND_UID");
