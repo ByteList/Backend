@@ -134,7 +134,9 @@ public class WebService {
                                             Document doc = new Document();
                                             final int[] i = {0};
                                             find.forEach((Block<? super Document>) document -> {
+                                                document.remove("_id");
                                                 doc.append(String.valueOf(i[0]++), document);
+
                                             });
                                             first = doc;
 
