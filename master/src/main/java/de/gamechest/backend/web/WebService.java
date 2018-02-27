@@ -1,6 +1,5 @@
 package de.gamechest.backend.web;
 
-import com.mongodb.CursorType;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -106,15 +105,18 @@ public class WebService {
 
 
                                     if(requestParameters.containsKey("db")) {
-                                        String dbId = requestParameters.get("db").get(0);
+                                        String dbId = requestParameters.get("db").get(0),
+                                                dbName = "null";
 
                                         try {
                                             int id = Integer.parseInt(dbId);
                                             FindIterable<Document> find;
                                             MongoCollection<Document> collection;
                                             if(id > 999) {
+                                                dbName = DatabaseCollection.getDatabaseCollectionFromId(id).getName();
                                                 collection = databaseManager.getCollection(DatabaseCollection.getDatabaseCollectionFromId(id));
                                             } else {
+                                                dbName = de.gamechest.database.DatabaseCollection.getDatabaseCollectionFromId(id).getName();
                                                 collection = databaseManager.getParentDatabaseManager()
                                                         .getCollection(de.gamechest.database.DatabaseCollection.getDatabaseCollectionFromId(id));
                                             }
@@ -125,14 +127,13 @@ public class WebService {
                                             } else {
                                                 find = collection.find();
                                             }
-                                            find.cursorType(CursorType.NonTailable);
                                             first = find.first();
                                             first.remove("_id");
 
                                         } catch (NullPointerException ex) {
-                                            first = new Document("db", dbId).append("error", "database doesn't exist");
+                                            first = new Document("db", dbId+"{"+dbName+"}").append("error", "database doesn't exist");
                                         } catch (NumberFormatException ex) {
-                                            first = new Document("db", dbId).append("error", "database must be an integer");
+                                            first = new Document("db", dbId+"{"+dbName+"}").append("error", "database must be an integer");
                                         }
 
                                     }
