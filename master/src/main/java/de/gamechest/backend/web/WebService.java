@@ -11,8 +11,6 @@ import com.sun.net.httpserver.HttpServer;
 import de.gamechest.backend.Backend;
 import de.gamechest.backend.database.DatabaseCollection;
 import de.gamechest.backend.database.DatabaseManager;
-import de.gamechest.backend.database.user.DatabaseUser;
-import de.gamechest.backend.database.user.DatabaseUserObject;
 import de.gamechest.backend.log.BackendLogger;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -85,33 +83,20 @@ public class WebService {
 
                             final Map<String, List<String>> requestParameters = getRequestParameters(httpExchange.getRequestURI());
 
+                            logger.info("[IR] "+httpExchange.getRemoteAddress().toString()+": "+httpExchange.getRequestURI().toString());
+
                             if (requestParameters.containsKey("uid")) {
                                 String uid = requestParameters.get("uid").get(0);
                                 if (uid.equals(backend.getBackendUid())) {
                                     first.append("auth", "true");
 
-                                    if (requestParameters.containsKey("webUserById")) {
-                                        String userId = requestParameters.get("webUserById").get(0);
-                                        DatabaseUser dbUser = backend.getDatabaseManager().getUser(userId);
-
-                                        if (!dbUser.existsUser()) {
-                                            first = new Document();
-                                            first.append(DatabaseUserObject.ID.getName(), userId);
-                                            first.append("error", "user doesn't exist");
-                                        } else {
-                                            first = dbUser.getFind().first();
-                                            first.remove("_id");
-//                                            first.append(DatabaseUserObject.NAME.getName(), dbUser.getDatabaseElement(DatabaseUserObject.NAME).getAsString());
-//                                            first.append(DatabaseUserObject.PERMISSION_LEVEL.getName(), dbUser.getDatabaseElement(DatabaseUserObject.PERMISSION_LEVEL).getAsString());
-//                                            first.append(DatabaseUserObject.PASSWORD.getName(), dbUser.getDatabaseElement(DatabaseUserObject.PASSWORD).getAsString());
-                                        }
-                                    }
 
                                     if(requestParameters.containsKey("db")) {
                                         String dbId = requestParameters.get("db").get(0),
                                                 dbName = "null";
                                         FindIterable<Document> find;
                                         MongoCollection<Document> collection;
+                                        JsonCoding jsonCoding = JsonCoding.NORMAL;
 
                                         try {
                                             int id = Integer.parseInt(dbId);
@@ -139,8 +124,15 @@ public class WebService {
                                                 find.projection(Projections.include(accesses));
                                             }
 
+                                            if(requestParameters.containsKey("coding")) {
+                                                String coding = requestParameters.get("coding").get(0);
+
+                                                jsonCoding = JsonCoding.getJsonCodingFromId(Integer.parseInt(coding));
+                                            }
+
                                             Document doc = new Document();
                                             final int[] i = {0};
+
                                             find.forEach((Block<? super Document>) document -> {
                                                 document.remove("_id");
                                                 doc.append(String.valueOf(i[0]++), document);
