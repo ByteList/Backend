@@ -1,9 +1,11 @@
 package de.gamechest.backend.web;
 
 import com.mongodb.Block;
+import com.mongodb.CursorType;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 import de.gamechest.backend.Backend;
@@ -105,7 +107,6 @@ public class WebService {
                                         }
                                     }
 
-
                                     if(requestParameters.containsKey("db")) {
                                         String dbId = requestParameters.get("db").get(0),
                                                 dbName = "null";
@@ -130,6 +131,14 @@ public class WebService {
                                             } else {
                                                 find = collection.find();
                                             }
+
+                                            if(requestParameters.containsKey("accesses")) {
+                                                String[] accesses = requestParameters.get("accesses").get(0).split(":");
+
+                                                find.cursorType(CursorType.NonTailable);
+                                                find.projection(Projections.include(accesses));
+                                            }
+
                                             Document doc = new Document();
                                             final int[] i = {0};
                                             find.forEach((Block<? super Document>) document -> {
