@@ -83,7 +83,7 @@ public class WebService {
 
                             final Map<String, List<String>> requestParameters = getRequestParameters(httpExchange.getRequestURI());
 
-                            logger.info("[IR] "+httpExchange.getRemoteAddress().toString()+": "+httpExchange.getRequestURI().toString());
+                            logger.info("[IR "+httpExchange.getRemoteAddress().toString()+"] "+httpExchange.getRequestURI().toString());
 
                             if (requestParameters.containsKey("uid")) {
                                 String uid = requestParameters.get("uid").get(0);
