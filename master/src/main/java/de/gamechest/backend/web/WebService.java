@@ -123,6 +123,7 @@ public class WebService {
 
                                             if(requestParameters.containsKey("filter")) {
                                                 String[] filter = requestParameters.get("filter").get(0).split(":");
+                                                System.out.println(requestParameters.get("filter").get(0));
                                                 find = collection.find(Filters.eq(filter[0], filter[1]));
                                             } else {
                                                 find = collection.find();
