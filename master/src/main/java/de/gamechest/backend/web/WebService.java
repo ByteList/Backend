@@ -138,14 +138,8 @@ public class WebService {
                                             });
                                             first = doc;
 
-                                        } catch (NullPointerException ex) {
-                                            first = new Document("db", dbId+"{"+dbName+"}").append("error", "database doesn't exist");
-                                            ex.printStackTrace();
-                                        } catch (NumberFormatException ex) {
-                                            first = new Document("db", dbId+"{"+dbName+"}").append("error", "database must be an integer");
-                                            ex.printStackTrace();
                                         } catch (Exception ex) {
-                                            first = new Document("db", dbId+"{"+dbName+"}").append("error", "unknown error");
+                                            first = new Document("db", dbId+"{"+dbName+"}").append("error", ex.getMessage());
                                             ex.printStackTrace();
                                         }
                                     }
