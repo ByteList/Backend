@@ -139,6 +139,7 @@ public class WebService {
 
                                             });
                                             first = doc;
+                                            first.append("size", i[0]);
 
                                         } catch (Exception ex) {
                                             first = new Document("db", dbId+"{"+dbName+"}").append("error", ex.getMessage());
