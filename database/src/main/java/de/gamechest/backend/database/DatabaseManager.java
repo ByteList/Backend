@@ -91,6 +91,8 @@ public class DatabaseManager {
 
             dbSettings.setDatabaseObject(BACKEND_VERSION, backendVersion);
         });
+
+        this.parentDatabaseManager.init();
     }
 
     public boolean existsCollection(String collection) {
