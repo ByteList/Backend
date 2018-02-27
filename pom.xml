@@ -25,18 +25,18 @@
         <service.version>1.0</service.version>
     </properties>
 
-    <modules>
-        <module>database</module>
-        <module>updater</module>
-        <module>master</module>
-    </modules>
-
     <repositories>
         <repository>
             <id>byte-repo</id>
             <url>https://vs.bytelist.de/nexus/repository/byte-repo/</url>
         </repository>
     </repositories>
+
+    <modules>
+        <module>database</module>
+        <module>updater</module>
+        <module>master</module>
+    </modules>
 
     <dependencies>
         <dependency>

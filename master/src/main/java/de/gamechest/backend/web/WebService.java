@@ -1,8 +1,14 @@
 package de.gamechest.backend.web;
 
+import com.mongodb.CursorType;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 import de.gamechest.backend.Backend;
+import de.gamechest.backend.database.DatabaseCollection;
+import de.gamechest.backend.database.DatabaseManager;
 import de.gamechest.backend.database.user.DatabaseUser;
 import de.gamechest.backend.database.user.DatabaseUserObject;
 import de.gamechest.backend.log.BackendLogger;
@@ -50,6 +56,7 @@ public class WebService {
     private final String METHOD_OPTIONS = "OPTIONS";
     private final String ALLOWED_METHODS = METHOD_GET + "," + METHOD_OPTIONS;
 
+
     public WebService(BackendLogger logger, int port, boolean local) {
         this.logger = logger;
         this.port = port;
@@ -58,6 +65,7 @@ public class WebService {
 
     public void startWebServer(Backend backend) {
         logger.info("Starting Web-Server...");
+        final DatabaseManager databaseManager = backend.getDatabaseManager();
 
         try {
             this.httpServer = HttpServer.create(new InetSocketAddress((local ? "127.0.0.1" : "0.0.0.0"), port), 1);
@@ -68,7 +76,7 @@ public class WebService {
                     final String requestMethod = httpExchange.getRequestMethod().toUpperCase();
                     switch (requestMethod) {
                         case METHOD_GET:
-                            org.bson.Document first = backend.getDatabaseManager().getSettings(BACKEND_HOST, BACKEND_VERSION, BACKEND_STARTED).getFind().first();
+                            org.bson.Document first = databaseManager.getSettings(BACKEND_HOST, BACKEND_VERSION, BACKEND_STARTED).getFind().first();
                             first.remove("_id");
                             first.append("auth", "false");
 
@@ -79,8 +87,8 @@ public class WebService {
                                 if (uid.equals(backend.getBackendUid())) {
                                     first.append("auth", "true");
 
-                                    if (requestParameters.containsKey("userId")) {
-                                        String userId = requestParameters.get("userId").get(0);
+                                    if (requestParameters.containsKey("webUserById")) {
+                                        String userId = requestParameters.get("webUserById").get(0);
                                         DatabaseUser dbUser = backend.getDatabaseManager().getUser(userId);
 
                                         if (!dbUser.existsUser()) {
@@ -94,6 +102,39 @@ public class WebService {
 //                                            first.append(DatabaseUserObject.PERMISSION_LEVEL.getName(), dbUser.getDatabaseElement(DatabaseUserObject.PERMISSION_LEVEL).getAsString());
 //                                            first.append(DatabaseUserObject.PASSWORD.getName(), dbUser.getDatabaseElement(DatabaseUserObject.PASSWORD).getAsString());
                                         }
+                                    }
+
+
+                                    if(requestParameters.containsKey("db")) {
+                                        String dbId = requestParameters.get("db").get(0);
+
+                                        try {
+                                            int id = Integer.parseInt(dbId);
+                                            FindIterable<Document> find;
+                                            MongoCollection<Document> collection;
+                                            if(id > 999) {
+                                                collection = databaseManager.getCollection(DatabaseCollection.getDatabaseCollectionFromId(id));
+                                            } else {
+                                                collection = databaseManager.getParentDatabaseManager()
+                                                        .getCollection(de.gamechest.database.DatabaseCollection.getDatabaseCollectionFromId(id));
+                                            }
+
+                                            if(requestParameters.containsKey("filter")) {
+                                                String[] filter = requestParameters.get("filter").get(0).split(":");
+                                                find = collection.find(Filters.eq(filter[0], filter[1]));
+                                            } else {
+                                                find = collection.find();
+                                            }
+                                            find.cursorType(CursorType.NonTailable);
+                                            first = find.first();
+                                            first.remove("_id");
+
+                                        } catch (NullPointerException ex) {
+                                            first = new Document("error", "database doesn't exist");
+                                        } catch (NumberFormatException ex) {
+                                            first = new Document("error", "database must be an integer");
+                                        }
+
                                     }
                                 }
                             }

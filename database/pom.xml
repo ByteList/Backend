@@ -26,6 +26,13 @@
             <version>17.0</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>de.gamechest</groupId>
+            <artifactId>database</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

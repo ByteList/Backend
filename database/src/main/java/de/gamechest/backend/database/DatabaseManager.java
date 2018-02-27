@@ -45,6 +45,8 @@ public class DatabaseManager {
 
     @Getter
     private AsyncDatabaseManager async;
+    @Getter
+    private de.gamechest.database.DatabaseManager parentDatabaseManager;
 
     public DatabaseManager(String backendUid, String backendVersion, String host, int port, String username, String password, String database) throws Exception {
         this.backendUid = backendUid;
@@ -68,6 +70,8 @@ public class DatabaseManager {
         this.mongoDatabase = this.mongoClient.getDatabase(database);
 
         this.async = new AsyncDatabaseManager(this);
+
+        this.parentDatabaseManager = new de.gamechest.database.DatabaseManager(mongoClient, "server");
     }
 
     public void init() {
