@@ -12,6 +12,7 @@ import de.gamechest.backend.database.user.DatabaseUser;
 import de.gamechest.backend.database.user.DatabaseUserObject;
 import de.gamechest.backend.log.BackendLogger;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -124,7 +125,8 @@ public class WebService {
                                             if(requestParameters.containsKey("filter")) {
                                                 String[] filter = requestParameters.get("filter").get(0).split(":");
                                                 System.out.println(requestParameters.get("filter").get(0));
-                                                find = collection.find(Filters.eq(filter[0], filter[1]));
+                                                Bson f = Filters.eq(filter[0], filter[1]);
+                                                find = collection.find(f);
                                             } else {
                                                 find = collection.find();
                                             }
