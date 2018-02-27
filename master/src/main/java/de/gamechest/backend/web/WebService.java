@@ -1,5 +1,6 @@
 package de.gamechest.backend.web;
 
+import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -108,11 +109,11 @@ public class WebService {
                                     if(requestParameters.containsKey("db")) {
                                         String dbId = requestParameters.get("db").get(0),
                                                 dbName = "null";
+                                        FindIterable<Document> find;
+                                        MongoCollection<Document> collection;
 
                                         try {
                                             int id = Integer.parseInt(dbId);
-                                            FindIterable<Document> find;
-                                            MongoCollection<Document> collection;
                                             if(id > 999) {
                                                 dbName = DatabaseCollection.getDatabaseCollectionFromId(id).getName();
                                                 collection = databaseManager.getCollection(DatabaseCollection.getDatabaseCollectionFromId(id));
@@ -130,8 +131,12 @@ public class WebService {
                                             } else {
                                                 find = collection.find();
                                             }
-                                            first = find.first();
-                                            first.remove("_id");
+                                            Document doc = new Document();
+                                            final int[] i = {0};
+                                            find.forEach((Block<? super Document>) document -> {
+                                                doc.append(String.valueOf(i[0]++), document);
+                                            });
+                                            first = doc;
 
                                         } catch (NullPointerException ex) {
                                             first = new Document("db", dbId+"{"+dbName+"}").append("error", "database doesn't exist");
