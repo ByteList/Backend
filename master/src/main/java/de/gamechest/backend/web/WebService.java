@@ -130,9 +130,9 @@ public class WebService {
                                             first.remove("_id");
 
                                         } catch (NullPointerException ex) {
-                                            first = new Document("error", "database doesn't exist");
+                                            first = new Document("db", dbId).append("error", "database doesn't exist");
                                         } catch (NumberFormatException ex) {
-                                            first = new Document("error", "database must be an integer");
+                                            first = new Document("db", dbId).append("error", "database must be an integer");
                                         }
 
                                     }
