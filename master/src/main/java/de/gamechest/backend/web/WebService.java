@@ -121,7 +121,9 @@ public class WebService {
                                                 dbName = de.gamechest.database.DatabaseCollection.getDatabaseCollectionFromId(id).getName();
                                                 collection = databaseManager.getParentDatabaseManager()
                                                         .getCollection(de.gamechest.database.DatabaseCollection.getDatabaseCollectionFromId(id));
-                                                System.out.println(collection.getNamespace().getCollectionName());
+                                                if(collection == null) {
+                                                    System.err.println("collection = null!");
+                                                }
                                             }
 
                                             if(requestParameters.containsKey("filter")) {
