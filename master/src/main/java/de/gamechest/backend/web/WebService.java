@@ -132,10 +132,10 @@ public class WebService {
                                             }
 
                                             if(requestParameters.containsKey("set")) {
-                                                String[] args = requestParameters.get("set").get(0).split("%;%");
+                                                String[] args = requestParameters.get("set").get(0).split("~;~");
                                                 for(String arg : args) {
-                                                    String setter = arg.split("%:%")[0];
-                                                    String value = arg.split("%:%")[1];
+                                                    String setter = arg.split("§:§")[0];
+                                                    String value = arg.split("§:§")[1];
 
                                                     BasicDBObject uDoc = new BasicDBObject();
                                                     uDoc.append("$set", new BasicDBObject().append(setter, value));
