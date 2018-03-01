@@ -1,5 +1,6 @@
 package de.gamechest.backend.web;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.Block;
 import com.mongodb.CursorType;
 import com.mongodb.client.FindIterable;
@@ -128,6 +129,20 @@ public class WebService {
                                                 String coding = requestParameters.get("coding").get(0);
 
                                                 jsonCoding = JsonCoding.getJsonCodingFromId(Integer.parseInt(coding));
+                                            }
+
+                                            if(requestParameters.containsKey("set")) {
+                                                String[] args = requestParameters.get("set").get(0).split("%;%");
+                                                for(String arg : args) {
+                                                    String setter = arg.split("%:%")[0];
+                                                    String value = arg.split("%:%")[1];
+
+                                                    BasicDBObject uDoc = new BasicDBObject();
+                                                    uDoc.append("$set", new BasicDBObject().append(setter, value));
+
+                                                    BasicDBObject basicDBObject = new BasicDBObject();
+                                                    collection.updateOne(basicDBObject, uDoc);
+                                                }
                                             }
 
                                             Document doc = new Document();
