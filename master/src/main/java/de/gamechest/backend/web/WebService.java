@@ -110,8 +110,9 @@ public class WebService {
                                                         .getCollection(de.gamechest.database.DatabaseCollection.getDatabaseCollectionFromId(id));
                                             }
 
+                                            String[] filter = null;
                                             if(requestParameters.containsKey("filter")) {
-                                                String[] filter = requestParameters.get("filter").get(0).split(":");
+                                                filter = requestParameters.get("filter").get(0).split(":");
                                                 Bson f = Filters.eq(filter[0], filter[1]);
                                                 find = collection.find(f);
                                             } else {
@@ -141,6 +142,9 @@ public class WebService {
                                                     uDoc.append("$set", new BasicDBObject().append(setter, value));
 
                                                     BasicDBObject basicDBObject = new BasicDBObject();
+                                                    if(filter != null) {
+                                                        basicDBObject = new BasicDBObject(filter[0], filter[1]);
+                                                    }
                                                     collection.updateOne(basicDBObject, uDoc);
                                                 }
                                             }
