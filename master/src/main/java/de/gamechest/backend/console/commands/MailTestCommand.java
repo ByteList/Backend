@@ -8,14 +8,14 @@ import de.gamechest.backend.console.Command;
  * <p>
  * Copyright by ByteList - https://bytelist.de/
  */
-public class EndCommand extends Command {
+public class MailTestCommand extends Command {
 
-    public EndCommand() {
-        super("end", "shutdown the backend");
+    public MailTestCommand() {
+        super("mailtest", "test the mail client");
     }
 
     @Override
     public void execute(String[] args) {
-        Backend.getInstance().stop();
+        Backend.getInstance().getMailClient().sendTestMail();
     }
 }

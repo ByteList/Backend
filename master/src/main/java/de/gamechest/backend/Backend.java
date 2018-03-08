@@ -4,9 +4,11 @@ import de.gamechest.backend.config.Document;
 import de.gamechest.backend.console.CommandHandler;
 import de.gamechest.backend.console.commands.EndCommand;
 import de.gamechest.backend.console.commands.HelpCommand;
+import de.gamechest.backend.console.commands.MailTestCommand;
 import de.gamechest.backend.database.DatabaseManager;
 import de.gamechest.backend.log.BackendLogger;
 import de.gamechest.backend.log.LoggingOutPutStream;
+import de.gamechest.backend.mail.client.MailClient;
 import de.gamechest.backend.setup.Setup;
 import de.gamechest.backend.updater.Updater;
 import de.gamechest.backend.web.WebService;
@@ -59,6 +61,8 @@ public class Backend {
     private WebService webService;
     @Getter
     private Updater updater;
+    @Getter
+    private MailClient mailClient;
 
     private String stopDate;
 
@@ -114,11 +118,13 @@ public class Backend {
         }
 
         this.webService = new WebService(logger, backendDocument.getInt("web-port"), backendDocument.getBoolean("web-access-local"));
+        this.mailClient = new MailClient();
 
         this.commandHandler = new CommandHandler();
 
         this.commandHandler.registerCommand(new EndCommand());
         this.commandHandler.registerCommand(new HelpCommand());
+        this.commandHandler.registerCommand(new MailTestCommand());
     }
 
     public void start() {
