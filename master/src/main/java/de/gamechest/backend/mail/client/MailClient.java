@@ -30,10 +30,10 @@ public class MailClient {
     }
 
     public void sendTestMail() {
-        sendMail("Test Mail yo!", "hoffe das kommt an höhö", "temp@bytelist.de");
+        sendHtmlMail("Registrierung auf game-chest.de", getClass().getClassLoader().getResourceAsStream("mails/register.html"), "temp@bytelist.de");
     }
 
-    private void sendMail(String subject, String text, String toAddress) {
+    public void sendMail(String subject, String text, String toAddress) {
         try {
             MimeMessage message = new MimeMessage(session);
 
@@ -42,6 +42,23 @@ public class MailClient {
 
             message.setSubject(subject);
             message.setText(text);
+
+            Transport.send(message);
+            System.out.println("[Mail] Sent mail to "+toAddress+": "+subject);
+        } catch (MessagingException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void sendHtmlMail(String subject, Object content, String toAddress) {
+        try {
+            MimeMessage message = new MimeMessage(session);
+
+            message.setFrom(new InternetAddress(fromAddress));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
+
+            message.setSubject(subject);
+            message.setContent(content, "text/html");
 
             Transport.send(message);
             System.out.println("[Mail] Sent mail to "+toAddress+": "+subject);
