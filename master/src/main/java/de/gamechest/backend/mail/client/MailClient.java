@@ -35,8 +35,8 @@ public class MailClient {
 
     public void sendTestMail() {
         try {
-            String content = Resources.toString(Resources.getResource("mails/register.html"), Charset.defaultCharset())
-                    .replace("#{user.name}", "ByteList").replace("#{user.verify}", "https://game-chest.de/register.php?mail=bla");
+            String content = Resources.toString(Resources.getResource("mails/register.html"), Charset.forName("UTF-8"))
+                    .replace("#{user.name}", "ByteList").replace("#{user.verifyUrl}", "https://game-chest.de/register.php?mail=bla");
             sendHtmlMail("Registrierung auf game-chest.de", content, "temp@bytelist.de");
         } catch (IOException e) {
             e.printStackTrace();
