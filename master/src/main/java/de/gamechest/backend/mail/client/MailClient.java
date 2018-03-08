@@ -1,8 +1,12 @@
 package de.gamechest.backend.mail.client;
 
+import com.google.common.io.Resources;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 /**
@@ -30,7 +34,13 @@ public class MailClient {
     }
 
     public void sendTestMail() {
-        sendHtmlMail("Registrierung auf game-chest.de", getClass().getClassLoader().getResourceAsStream("mails/register.html"), "temp@bytelist.de");
+        try {
+            String content = Resources.toString(Resources.getResource("mails/register.html"), Charset.defaultCharset())
+                    .replace("#{user.name}", "ByteList").replace("#{user.verify}", "https://game-chest.de/register.php?mail=bla");
+            sendHtmlMail("Registrierung auf game-chest.de", content, "temp@bytelist.de");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void sendMail(String subject, String text, String toAddress) {
