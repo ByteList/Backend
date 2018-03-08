@@ -1,9 +1,6 @@
 package de.gamechest.backend.mail.client;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
@@ -17,12 +14,19 @@ public class MailClient {
 
     private final String fromAddress;
     private final Properties properties;
+    private final Session session;
 
-
-    public MailClient() {
-        this.fromAddress = "noreply@game-chest.de";
+    public MailClient(String sender, String host, String user, String password) {
+        this.fromAddress = sender;
         this.properties = System.getProperties();
-        this.properties.setProperty("mail.smtp.host", "localhost");
+        this.properties.setProperty("mail.smtp.host", host);
+        this.properties.setProperty("mail.smtp.auth", "true");
+        this.session = Session.getDefaultInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(user, password);
+            }
+        });
     }
 
     public void sendTestMail() {
@@ -30,16 +34,13 @@ public class MailClient {
     }
 
     private void sendMail(String subject, String text, String toAddress) {
-        Session session = Session.getDefaultInstance(properties);
         try {
             MimeMessage message = new MimeMessage(session);
 
             message.setFrom(new InternetAddress(fromAddress));
-
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
 
             message.setSubject(subject);
-
             message.setText(text);
 
             Transport.send(message);
