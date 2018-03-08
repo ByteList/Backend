@@ -1,14 +1,17 @@
-Hallo #{user.name},<br>
-bevor dein Benutzerkonto bei game-chest.de aktiviert und somit deine Registrierung abgeschlossen werden kann, musst du dein Konto mit Hilfe des folgenden Links bestätigen.<br>
-<br>
-<h2>Benutzerkonto bestätigen:</h2>
-<a href="#{user.verifyUrl}">#{user.verifyUrl}</a>
-<br>
-<br>
-<p>
-    Diese Email wurde automatisch von unserem System versandt, da sich jemand damit auf https://game-chest.de/ registriert hat.<br>
-    Sollte dies nicht gewollt sein, bitten wir Sie diese Email zu ignorieren.
-</p>
-<br>
-Danke für deine Registrierung,<br>
-Game-Chest.de
+<div style="font-family: Arial; border: 1px solid #ccc; border-radius: 4px; background-color: #f6f6f6;">
+    <div style="padding: 5px;">
+        Hallo <span style="color: #0088d2;">#{user.name}</span>,<br>
+        bevor dein Benutzerkonto bei game-chest.de aktiviert und somit deine Registrierung abgeschlossen werden kann, musst du dein Konto mit Hilfe des folgenden Links bestätigen.<br><br>
+
+        <h2 style="color: #0088d2;">Benutzerkonto bestätigen:</h2>
+        <a href="#{user.verifyUrl}">#{user.verifyUrl}</a><br><br>
+
+        <p>
+            Diese Email wurde automatisch von unserem System versandt, da sich jemand damit auf <a href="https://game-chest.de/">https://game-chest.de/</a> registriert hat.<br>
+            Sollte dies nicht gewollt sein, bitten wir Sie diese Email zu ignorieren.
+        </p><br>
+
+        Danke für deine Registrierung,<br>
+        Game-Chest.de
+    </div>
+</div>
