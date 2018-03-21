@@ -182,7 +182,7 @@ public class WebService {
                                             first.append("size", i[0]);
 
                                         } catch (Exception ex) {
-                                            first = new Document("db", dbId+"{"+dbName+"}").append("error", ex.getMessage());
+                                            first = new Document("db", dbId+"{"+dbName+"}").append("error", ex.getClass().getSimpleName()).append("msg", ex.getMessage());
                                             ex.printStackTrace();
                                         }
                                     }
