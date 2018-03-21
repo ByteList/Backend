@@ -168,7 +168,7 @@ public class WebService {
                                                             if(o instanceof Document) {
                                                                 stringed.append(s,((Document) o).toJson());
                                                             } else {
-                                                                stringed.append(s, o.toString());
+                                                                stringed.append(s, (o == null ? "null" : o.toString()));
                                                             }
                                                         });
 
