@@ -152,11 +152,26 @@ public class WebService {
                                             Document doc = new Document();
                                             final int[] i = {0};
 
-                                            find.forEach((Block<? super Document>) document -> {
-                                                document.remove("_id");
-                                                doc.append(String.valueOf(i[0]++), document);
+                                            switch (jsonCoding) {
+                                                case NORMAL:
+                                                    find.forEach((Block<? super Document>) document -> {
+                                                        document.remove("_id");
+                                                        doc.append(String.valueOf(i[0]++), document);
+                                                    });
+                                                    break;
+                                                case STRING:
+                                                    find.forEach((Block<? super Document>) document -> {
+                                                        document.remove("_id");
 
-                                            });
+                                                        Document stringed = new Document();
+                                                        document.forEach((s, o) -> stringed.append(s, String.valueOf(o)));
+
+                                                        doc.append(String.valueOf(i[0]++), stringed);
+
+                                                    });
+                                                    break;
+                                            }
+
                                             first = doc;
                                             first.append("size", i[0]);
 

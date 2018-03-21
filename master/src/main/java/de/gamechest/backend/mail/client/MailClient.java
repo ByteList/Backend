@@ -43,6 +43,16 @@ public class MailClient {
         }
     }
 
+    public void sendRegisterMail(String user, String verifyCode) {
+        try {
+            String content = Resources.toString(Resources.getResource("mails/register.html"), Charset.forName("UTF-8"))
+                    .replace("#{user.name}", user).replace("#{user.verifyUrl}", "https://game-chest.de/register/"+verifyCode+"/");
+            sendHtmlMail("Registrierung auf game-chest.de", content, "mail@bytelist.de");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void sendMail(String subject, String text, String toAddress) {
         try {
             MimeMessage message = new MimeMessage(session);
