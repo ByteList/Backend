@@ -164,7 +164,13 @@ public class WebService {
                                                         document.remove("_id");
 
                                                         Document stringed = new Document();
-                                                        document.forEach((s, o) -> stringed.append(s, o.toString()));
+                                                        document.forEach((s, o) -> {
+                                                            if(o instanceof Document) {
+                                                                stringed.append(s,((Document) o).toJson());
+                                                            } else {
+                                                                stringed.append(s, o.toString());
+                                                            }
+                                                        });
 
                                                         doc.append(String.valueOf(i[0]++), stringed);
 
