@@ -164,7 +164,7 @@ public class WebService {
                                                         document.remove("_id");
 
                                                         Document stringed = new Document();
-                                                        document.forEach((s, o) -> stringed.append(s, String.valueOf(o)));
+                                                        document.forEach((s, o) -> stringed.append(s, o.toString()));
 
                                                         doc.append(String.valueOf(i[0]++), stringed);
 
