@@ -125,6 +125,8 @@ public class Backend {
         this.mailClient = new MailClient(backendDocument.getString("mail-sender"), backendDocument.getString("mail-host"),
                 backendDocument.getString("mail-user"), backendDocument.getString("mail-password"));
 
+        this.socketService = new SocketService();
+
         this.commandHandler = new CommandHandler();
 
         this.commandHandler.registerCommand(new EndCommand());
