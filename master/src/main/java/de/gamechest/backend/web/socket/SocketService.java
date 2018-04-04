@@ -1,6 +1,7 @@
 package de.gamechest.backend.web.socket;
 
 import de.gamechest.backend.Backend;
+import org.bson.Document;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -30,10 +31,12 @@ public class SocketService {
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                         PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
                         String text = bufferedReader.readLine();
-                        // Input ausgeben
+
                         System.out.println(text);
-                        // Echo Input (Input zurueckgeben)
-                        printWriter.println(text);
+
+                        Document document = Document.parse(text);
+
+                        printWriter.println(document.getString("tab"));
                         printWriter.flush();
                         printWriter.close();
                     }
