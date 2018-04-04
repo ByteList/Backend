@@ -35,8 +35,10 @@ public class SocketService {
                         System.out.println(text);
 
                         Document document = Document.parse(text);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        document.forEach((s, o) -> stringBuilder.append(o.toString()));
 
-                        printWriter.println(document.getString("tab"));
+                        printWriter.println(stringBuilder.toString());
                         printWriter.flush();
                         printWriter.close();
                     }
