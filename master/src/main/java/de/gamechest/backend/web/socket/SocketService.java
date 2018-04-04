@@ -1,6 +1,7 @@
 package de.gamechest.backend.web.socket;
 
 import de.gamechest.backend.Backend;
+import de.gamechest.backend.log.BackendLogger;
 import org.bson.Document;
 
 import java.io.*;
@@ -14,7 +15,19 @@ import java.net.Socket;
  */
 public class SocketService {
 
-    public void startSocketServer() {
+
+    private final BackendLogger logger;
+
+    private final int port;
+    private final boolean local;
+
+    public SocketService(BackendLogger logger, int port, boolean local) {
+        this.logger = logger;
+        this.port = port;
+        this.local = local;
+    }
+
+    public void startSocketServer(Backend backend) {
         new Thread(()-> {
             ServerSocket server = null;
             try {
@@ -23,18 +36,18 @@ public class SocketService {
                 e.printStackTrace();
             }
 
-            while(Backend.getInstance().isRunning){
+            while(backend.isRunning){
                 try {
                     if (server != null) {
                         Socket client  = server.accept();
                         InputStreamReader inputStreamReader =  new InputStreamReader(client.getInputStream());
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                         PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
-                        String text = bufferedReader.readLine();
+                        String target = bufferedReader.readLine();
 
-                        System.out.println(text);
+                        logger.info("[S "+client.getInetAddress().getHostAddress()+"] "+target);
 
-                        Document document = Document.parse(text);
+                        Document document = Document.parse(target);
                         StringBuilder stringBuilder = new StringBuilder();
                         document.forEach((s, o) -> stringBuilder.append(o.toString()));
 
@@ -48,6 +61,6 @@ public class SocketService {
                 }
             }
         }).start();
-
+        System.out.println("Socket-Server started!");
     }
 }
