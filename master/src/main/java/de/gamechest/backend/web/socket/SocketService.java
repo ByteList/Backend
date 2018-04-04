@@ -5,6 +5,7 @@ import de.gamechest.backend.log.BackendLogger;
 import org.bson.Document;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -31,7 +32,7 @@ public class SocketService {
         new Thread(()-> {
             ServerSocket server = null;
             try {
-                server = new ServerSocket(6000);
+                server = new ServerSocket(port, 50, InetAddress.getByName((local ? "127.0.0.1" : "0.0.0.0")));
             } catch (IOException e) {
                 e.printStackTrace();
             }
