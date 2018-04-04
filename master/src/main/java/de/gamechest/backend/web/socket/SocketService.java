@@ -1,6 +1,5 @@
 package de.gamechest.backend.web.socket;
 
-import com.google.gson.GsonBuilder;
 import de.gamechest.backend.Backend;
 import de.gamechest.backend.log.BackendLogger;
 import org.bson.Document;
@@ -50,10 +49,8 @@ public class SocketService {
                         logger.info("[S "+client.getInetAddress()+"] "+target);
 
                         Document document = Document.parse(target);
-                        StringBuilder stringBuilder = new StringBuilder();
-                        document.forEach((s, o) -> stringBuilder.append(o.toString()));
 
-                        printWriter.println(new GsonBuilder().create().toJson(stringBuilder.toString()));
+                        printWriter.println(document.toJson());
                         printWriter.flush();
                         printWriter.close();
                     }
