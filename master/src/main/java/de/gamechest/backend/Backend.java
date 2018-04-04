@@ -12,6 +12,7 @@ import de.gamechest.backend.mail.client.MailClient;
 import de.gamechest.backend.setup.Setup;
 import de.gamechest.backend.updater.Updater;
 import de.gamechest.backend.web.WebService;
+import de.gamechest.backend.web.socket.SocketService;
 import jline.console.ConsoleReader;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,6 +64,8 @@ public class Backend {
     private Updater updater;
     @Getter
     private MailClient mailClient;
+    @Getter
+    private SocketService socketService;
 
     private String stopDate;
 
@@ -133,6 +136,7 @@ public class Backend {
         this.isRunning = true;
         startStopThread();
         this.webService.startWebServer(this);
+        this.socketService.startSocketServer();
     }
 
     public void stop() {
