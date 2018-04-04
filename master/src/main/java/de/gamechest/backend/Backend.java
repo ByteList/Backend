@@ -125,7 +125,7 @@ public class Backend {
         this.mailClient = new MailClient(backendDocument.getString("mail-sender"), backendDocument.getString("mail-host"),
                 backendDocument.getString("mail-user"), backendDocument.getString("mail-password"));
 
-        this.socketService = new SocketService();
+        this.socketService = new SocketService(logger, backendDocument.getInt("socket-port"), backendDocument.getBoolean("socket-access-local"));
 
         this.commandHandler = new CommandHandler();
 
@@ -138,7 +138,7 @@ public class Backend {
         this.isRunning = true;
         startStopThread();
         this.webService.startWebServer(this);
-        this.socketService.startSocketServer();
+        this.socketService.startSocketServer(this);
     }
 
     public void stop() {
