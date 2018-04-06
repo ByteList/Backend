@@ -75,12 +75,12 @@ public class SqlLite {
         return null;
     }
 
-    public boolean executeSupportInsert(int ticketId, String topic, String owner) {
+    public boolean executeSupportInsert(int ticketId, String tab, String owner) {
         try {
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);
 
-            statement.executeUpdate("INSERT INTO support VALUES('"+ticketId+"', '"+topic+"', '"+owner+"')");
+            statement.executeUpdate("INSERT INTO support VALUES('"+ticketId+"', '"+tab+"', '"+owner+"')");
 
             statement.close();
             return true;

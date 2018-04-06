@@ -39,7 +39,7 @@ public class SocketService {
     }
 
     public void startSocketServer(Backend backend) {
-        if(this.sqlLite.createTableIfNotExists("support (id string, topic string, creator string)")) {
+        if(this.sqlLite.createTableIfNotExists("support (id string, tab string, creator string)")) {
             System.out.println("SqlLite - SocketService support table created!");
         }
         if(this.sqlLite.createTableIfNotExists("mc (id string, player string, uuid string, version string, sid string, subject string, msg string, answers string)")) {
@@ -102,7 +102,7 @@ public class SocketService {
                                             }
                                         }
 
-                                        if(this.sqlLite.executeSupportInsert(ticketId, topic, creator)) {
+                                        if(this.sqlLite.executeSupportInsert(ticketId, supportTab.getTabShort(), creator)) {
                                             if(this.sqlLite.executeSupportInsertMinecraft(ticketId, player, uuid, version, serverId, subject, msg)) {
                                                 send.append("id", ticketId);
                                                 send.append("topic", topic);
