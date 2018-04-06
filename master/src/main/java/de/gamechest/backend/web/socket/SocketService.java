@@ -42,7 +42,7 @@ public class SocketService {
         if(this.sqlLite.createTableIfNotExists("support (id string, topic string, creator string)")) {
             System.out.println("SqlLite - SocketService support table created!");
         }
-        if(this.sqlLite.createTableIfNotExists("mc (id string, player string, uuid, string, version string, sid string, subject string, msg string, answers string)")) {
+        if(this.sqlLite.createTableIfNotExists("mc (id string, player string, uuid string, version string, sid string, subject string, msg string, answers string)")) {
             System.out.println("SqlLite - SocketService mc table created!");
         }
         if(this.sqlLite.createTableIfNotExists("mcanswers (id string, number string, answer string, timestamp string)")) {
