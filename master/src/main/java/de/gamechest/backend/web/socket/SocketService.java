@@ -45,8 +45,8 @@ public class SocketService {
         if(this.sqlLite.createTableIfNotExists("mc (id string, player string, uuid, string, version string, sid string, subject string, msg string, answers string)")) {
             System.out.println("SqlLite - SocketService mc table created!");
         }
-        if(this.sqlLite.createTableIfNotExists("mc-answers (id string, number string, answer string, timestamp string)")) {
-            System.out.println("SqlLite - SocketService mc-answers table created!");
+        if(this.sqlLite.createTableIfNotExists("mcanswers (id string, number string, answer string, timestamp string)")) {
+            System.out.println("SqlLite - SocketService mcanswers table created!");
         }
         new Thread(()-> {
             ServerSocket server = null;

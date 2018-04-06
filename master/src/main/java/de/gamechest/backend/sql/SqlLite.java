@@ -96,7 +96,7 @@ public class SqlLite {
             statement.setQueryTimeout(30);
 
             statement.executeUpdate("INSERT INTO mc VALUES('"+ticketId+"', '"+player+"', '"+uuid+"', '"+version+"', '"+sid+"', '"+subject+"', '"+msg+"', '0')");
-            statement.executeUpdate("INSERT INTO mc-answers VALUES('"+ticketId+"', '0', 'state:open:system', '"+(System.currentTimeMillis()-1000)+"')");
+            statement.executeUpdate("INSERT INTO mcanswers VALUES('"+ticketId+"', '0', 'state:open:system', '"+(System.currentTimeMillis()-1000)+"')");
 
             statement.close();
             return true;
