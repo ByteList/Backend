@@ -148,6 +148,8 @@ public class Backend {
             @Override
             public void run() {
                 logger.info("Shutting down...");
+                socketService.stopSocketServer();
+
                 cleanStop();
             }
         }.start();
