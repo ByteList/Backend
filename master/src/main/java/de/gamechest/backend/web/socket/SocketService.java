@@ -62,8 +62,8 @@ public class SocketService {
                             case "support":
                                 String tabShort = document.getString("tab");
                                 SupportTab supportTab = SupportTab.getSupportTab(tabShort);
-                                int action = document.getInteger("action");
-                                SupportAction supportAction = SupportAction.getSupportTab(action);
+                                String action = document.getString("action");
+                                SupportAction supportAction = SupportAction.getSupportTab(Integer.valueOf(action));
 
                                 switch (supportTab) {
                                     case MINECRAFT:

@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 public enum SupportAction {
 
-    CREATE(2),
+    CREATE(0),
     CHANGE_STATE(1),
     ANSWER(3);
 
