@@ -35,7 +35,7 @@ public class MinecraftTable implements SqlLiteTable {
                 .append("id")
                 .append("topic")
                 .append("version")
-                .append("sid")
+                .append("serverid")
                 .append("subject")
                 .append("message")
                 .append("answers").create();
@@ -69,7 +69,7 @@ public class MinecraftTable implements SqlLiteTable {
                 .replace("id", String.valueOf(ticketId))
                 .replace("topic", topic)
                 .replace("version", version)
-                .replace("sid", serverId)
+                .replace("serverid", serverId)
                 .replace("subject", subject)
                 .replace("message", msg);
 
