@@ -46,21 +46,17 @@ public class SocketService {
 
             while (backend.isRunning) {
                 if (serverSocket != null) {
-                    ServerSocket server = serverSocket;
-
-                    backend.runAsync(() -> {
-                        try {
-                            Socket client = server.accept();
-                            InputStreamReader inputStreamReader = new InputStreamReader(client.getInputStream());
-                            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                            PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
-                            String target = bufferedReader.readLine();
+                    try {
+                        Socket client = serverSocket.accept();
+                        InputStreamReader inputStreamReader = new InputStreamReader(client.getInputStream());
+                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                        PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
+                        String target = bufferedReader.readLine();
+                        backend.runDocumentCallbackAsync((send) -> {
 
                             logger.info("[S " + client.getInetAddress() + ":" + client.getPort() + "] " + target);
 
                             Document document = Document.parse(target);
-                            Document send = new Document();
-
                             switch (document.getString("service")) {
                                 case "support":
                                     String tabShort = document.getString("tab");
@@ -101,11 +97,11 @@ public class SocketService {
                             printWriter.println(send.toJson());
                             printWriter.flush();
                             printWriter.close();
+                        });
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
 
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                    });
                 }
             }
         }).start();
