@@ -25,7 +25,7 @@ public class TicketsTable implements SqlLiteTable {
 
         this.name = "tickets";
         this.structure = new SqlLiteTableStructure()
-                .append("id")
+                .append("ticket_id")
                 .append("tab")
                 .append("creator")
                 .append("state").create();
@@ -56,7 +56,7 @@ public class TicketsTable implements SqlLiteTable {
     public String insert(int ticketId, String tab, String creator, String state) {
         String structure = this.structure.toValuesFormattedString();
         structure = structure
-                .replace("id", String.valueOf(ticketId))
+                .replace("ticket_id", String.valueOf(ticketId))
                 .replace("tab", tab)
                 .replace("creator", creator)
                 .replace("state", state);

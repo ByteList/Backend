@@ -32,10 +32,10 @@ public class MinecraftTable implements SqlLiteTable {
         this.name = this.supportTab.getTabShort();
 
         this.structure = new SqlLiteTableStructure()
-                .append("id")
+                .append("ticket_id")
                 .append("topic")
                 .append("version")
-                .append("serverid")
+                .append("server_id")
                 .append("subject")
                 .append("message")
                 .append("answers").create();
@@ -66,10 +66,10 @@ public class MinecraftTable implements SqlLiteTable {
     public String insert(int ticketId, String topic, String version, String serverId, String subject, String msg) {
         String structure = this.structure.toValuesFormattedString();
         structure = structure
-                .replace("id", String.valueOf(ticketId))
+                .replace("ticket_id", String.valueOf(ticketId))
                 .replace("topic", topic)
                 .replace("version", version)
-                .replace("serverid", serverId)
+                .replace("server_id", serverId)
                 .replace("subject", subject)
                 .replace("message", msg);
 

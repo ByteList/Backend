@@ -26,7 +26,7 @@ public class MinecraftAnswersTable implements SqlLiteTable {
 
         this.name = "mcanswers";
         this.structure = new SqlLiteTableStructure()
-                .append("id")
+                .append("ticket_id")
                 .append("answer")
                 .append("user")
                 .append("message")
@@ -77,7 +77,7 @@ public class MinecraftAnswersTable implements SqlLiteTable {
     public String insert(int ticketId, String user, String msg) {
         String structure = this.structure.toValuesFormattedString();
         structure = structure
-                .replace("id", String.valueOf(ticketId))
+                .replace("ticket_id", String.valueOf(ticketId))
                 .replace("answer", String.valueOf(countAnswers(ticketId)+1))
                 .replace("user", user)
                 .replace("message", msg)
