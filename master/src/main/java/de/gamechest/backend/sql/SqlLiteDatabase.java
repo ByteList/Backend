@@ -51,12 +51,10 @@ public abstract class SqlLiteDatabase {
         return this.tables.get(name);
     }
 
-    boolean addNewTable(SqlLiteTable sqlLiteTable) {
+    protected void addNewTable(SqlLiteTable sqlLiteTable) {
         if(!this.tables.containsKey(sqlLiteTable.getName())) {
             this.tables.put(sqlLiteTable.getName(), sqlLiteTable);
-            return true;
         }
-        return false;
     }
 
     public boolean removeTable(String name, Callback<SqlLiteTable> lastAction) {
