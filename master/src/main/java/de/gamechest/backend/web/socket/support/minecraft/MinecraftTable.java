@@ -37,8 +37,7 @@ public class MinecraftTable implements SqlLiteTable {
                 .append("version")
                 .append("server_id")
                 .append("subject")
-                .append("message")
-                .append("answers").create();
+                .append("message").create();
 
         database.executeUpdate("CREATE TABLE IF NOT EXISTS "+name+" "+structure.toStatementFormattedString());
     }
