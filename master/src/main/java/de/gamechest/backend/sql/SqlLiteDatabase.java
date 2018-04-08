@@ -51,7 +51,7 @@ public abstract class SqlLiteDatabase {
         return this.tables.get(name);
     }
 
-    public boolean addNewTable(SqlLiteTable sqlLiteTable) {
+    boolean addNewTable(SqlLiteTable sqlLiteTable) {
         if(!this.tables.containsKey(sqlLiteTable.getName())) {
             this.tables.put(sqlLiteTable.getName(), sqlLiteTable);
             return true;
@@ -80,6 +80,7 @@ public abstract class SqlLiteDatabase {
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("|-> Cmd: "+cmd);
         }
         return false;
     }
@@ -92,6 +93,7 @@ public abstract class SqlLiteDatabase {
             return statement.executeQuery(cmd);
         } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("|-> Cmd: "+cmd);
         }
         return null;
     }
