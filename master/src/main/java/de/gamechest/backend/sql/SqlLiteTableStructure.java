@@ -32,11 +32,11 @@ public class SqlLiteTableStructure {
     }
 
     public String toStatementFormattedString() {
-        return this.asString.replace("tableStructure[", "(").replace("]", ")").replaceAll("'", "");
+        return this.asString.replace("tableStructure[", "(").replace("]", ")").replace(" string", "").replace("'", "");
     }
 
     public String toValuesFormattedString() {
-        return this.asString.replace("tableStructure[", "(").replace("]", ")");
+        return this.asString.replace("tableStructure[", "(").replace("]", ")").replace(" string", "");
     }
 
 }
