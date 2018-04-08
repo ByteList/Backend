@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -70,7 +71,7 @@ public class Backend {
 
     private String stopDate;
 
-    private int runAsyncCount;
+    private ExecutorService executorService;
 
     public Backend() throws IOException {
         System.out.println("Init backend...");
@@ -135,6 +136,8 @@ public class Backend {
         this.commandHandler.registerCommand(new EndCommand());
         this.commandHandler.registerCommand(new HelpCommand());
         this.commandHandler.registerCommand(new MailTestCommand());
+
+        this.executorService = Executors.newCachedThreadPool();
     }
 
     public void start() {
@@ -215,7 +218,6 @@ public class Backend {
     }
 
     public void runAsync(Runnable runnable) {
-        runAsyncCount++;
-        Executors.newCachedThreadPool().execute(runnable);
+        this.executorService.execute(runnable);
     }
 }
