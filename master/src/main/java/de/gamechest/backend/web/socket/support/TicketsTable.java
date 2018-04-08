@@ -35,7 +35,7 @@ public class TicketsTable implements SqlLiteTable {
 
     @Override
     public int count() {
-        ResultSet resultSet = this.database.executeQuery("SELECT COUNT(id) AS rowcount FROM "+this.name);
+        ResultSet resultSet = this.database.executeQuery("SELECT COUNT(ticket_id) AS rowcount FROM "+this.name);
         int count = -1;
         try {
             while (resultSet.next()) {
