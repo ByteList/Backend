@@ -52,11 +52,11 @@ public class SocketService {
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                         PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
                         String target = bufferedReader.readLine();
+                        logger.info("[S " + client.getInetAddress() + ":" + client.getPort() + "] " + target);
+
                         backend.runDocumentCallbackAsync((send) -> {
-
-                            logger.info("[S " + client.getInetAddress() + ":" + client.getPort() + "] " + target);
-
                             Document document = Document.parse(target);
+
                             switch (document.getString("service")) {
                                 case "support":
                                     String tabShort = document.getString("tab");

@@ -31,7 +31,7 @@ public abstract class SqlLiteDatabase {
             this.connection = DriverManager.getConnection("jdbc:sqlite:"+name+".db");
             System.out.println("SqlLite - "+name+" started!");
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -40,7 +40,7 @@ public abstract class SqlLiteDatabase {
             try {
                 this.connection.close();
             } catch (SQLException e) {
-                System.err.println(e.getMessage());
+                e.printStackTrace();
                 return false;
             }
         }
@@ -79,7 +79,7 @@ public abstract class SqlLiteDatabase {
             statement.close();
             return true;
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }
@@ -91,7 +91,7 @@ public abstract class SqlLiteDatabase {
 
             return statement.executeQuery(cmd);
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
