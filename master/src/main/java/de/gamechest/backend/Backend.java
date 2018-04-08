@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.Executors;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 
@@ -215,6 +216,6 @@ public class Backend {
 
     public void runAsync(Runnable runnable) {
         runAsyncCount++;
-        new Thread(runnable, "Run Async Thread #"+String.valueOf(runAsyncCount)).start();
+        Executors.newCachedThreadPool().execute(runnable);
     }
 }
