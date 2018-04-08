@@ -36,72 +36,76 @@ public class SocketService {
     }
 
     public void startSocketServer(Backend backend) {
-        new Thread(()-> {
-            ServerSocket server = null;
+        new Thread(() -> {
+            ServerSocket serverSocket = null;
             try {
-                server = new ServerSocket(port, 50, InetAddress.getByName((local ? "127.0.0.1" : "0.0.0.0")));
+                serverSocket = new ServerSocket(port, 50, InetAddress.getByName((local ? "127.0.0.1" : "0.0.0.0")));
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            while(backend.isRunning){
-                try {
-                    if (server != null) {
-                        Socket client  = server.accept();
-                        InputStreamReader inputStreamReader =  new InputStreamReader(client.getInputStream());
-                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                        PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
-                        String target = bufferedReader.readLine();
+            while (backend.isRunning) {
+                if (serverSocket != null) {
+                    ServerSocket server = serverSocket;
 
-                        logger.info("[S "+client.getInetAddress()+":"+client.getPort()+"] "+target);
+                    backend.runAsync(() -> {
+                        try {
+                            Socket client = server.accept();
+                            InputStreamReader inputStreamReader = new InputStreamReader(client.getInputStream());
+                            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                            PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(client.getOutputStream()));
+                            String target = bufferedReader.readLine();
 
-                        Document document = Document.parse(target);
-                        Document send = new Document();
+                            logger.info("[S " + client.getInetAddress() + ":" + client.getPort() + "] " + target);
 
-                        switch (document.getString("service")) {
-                            case "support":
-                                String tabShort = document.getString("tab");
-                                SupportTab supportTab = SupportTab.getSupportTab(tabShort);
-                                String action = document.getString("action");
-                                SupportAction supportAction = SupportAction.getSupportTab(Integer.valueOf(action));
+                            Document document = Document.parse(target);
+                            Document send = new Document();
 
-                                switch (supportTab) {
-                                    case MINECRAFT:
-                                        switch (supportAction) {
-                                            case CREATE:
-                                                send = createMC(document, send);
-                                                break;
-                                            case CHANGE_STATE:
-                                                send = changeStateMC(document, send);
-                                                break;
-                                            case ANSWER:
-                                                send = answerMC(document, send);
-                                                break;
-                                        }
-                                        break;
-                                    case WEBSITE:
-                                        break;
-                                    case TEAMSPEAK:
-                                        break;
-                                    case DISCORD:
-                                        break;
-                                    case ANYTHING:
-                                        break;
-                                }
+                            switch (document.getString("service")) {
+                                case "support":
+                                    String tabShort = document.getString("tab");
+                                    SupportTab supportTab = SupportTab.getSupportTab(tabShort);
+                                    String action = document.getString("action");
+                                    SupportAction supportAction = SupportAction.getSupportTab(Integer.valueOf(action));
 
-                                break;
-                            default:
-                                send.append("error", "wrong service");
-                                break;
+                                    switch (supportTab) {
+                                        case MINECRAFT:
+                                            switch (supportAction) {
+                                                case CREATE:
+                                                    send = createMC(document, send);
+                                                    break;
+                                                case CHANGE_STATE:
+                                                    send = changeStateMC(document, send);
+                                                    break;
+                                                case ANSWER:
+                                                    send = answerMC(document, send);
+                                                    break;
+                                            }
+                                            break;
+                                        case WEBSITE:
+                                            break;
+                                        case TEAMSPEAK:
+                                            break;
+                                        case DISCORD:
+                                            break;
+                                        case ANYTHING:
+                                            break;
+                                    }
+
+                                    break;
+                                default:
+                                    send.append("error", "wrong service");
+                                    break;
+                            }
+
+                            printWriter.println(send.toJson());
+                            printWriter.flush();
+                            printWriter.close();
+
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
                         }
-
-                        printWriter.println(send.toJson());
-                        printWriter.flush();
-                        printWriter.close();
-                    }
-                }
-                catch (IOException ex){
-                    ex.printStackTrace();
+                    });
                 }
             }
         }).start();
@@ -109,8 +113,8 @@ public class SocketService {
     }
 
     public void stopSocketServer() {
-        if(database != null) {
-            if( this.database.close()) {
+        if (database != null) {
+            if (this.database.close()) {
                 System.out.println("SqlLite - SocketService closed!");
             }
         }
@@ -119,7 +123,7 @@ public class SocketService {
 
 
     private Document createMC(Document document, Document send) {
-        int ticketId = this.minecraftTable.count()+1;
+        int ticketId = this.minecraftTable.count() + 1;
         String creator = document.getString("creator");
         String topic = document.getString("topic");
         String version = document.getString("mcv");
@@ -128,7 +132,7 @@ public class SocketService {
         String msg = document.getString("msg");
 
 
-        if(this.database.createMinecraftTicket(ticketId, creator, topic, version, serverId, subject, msg)) {
+        if (this.database.createMinecraftTicket(ticketId, creator, topic, version, serverId, subject, msg)) {
             send.append("id", ticketId);
         } else {
             send.append("error", "createMinecraftTicket()");

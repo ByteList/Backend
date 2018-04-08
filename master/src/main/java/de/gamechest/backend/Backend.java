@@ -69,6 +69,8 @@ public class Backend {
 
     private String stopDate;
 
+    private int runAsyncCount;
+
     public Backend() throws IOException {
         System.out.println("Init backend...");
         instance = this;
@@ -209,5 +211,10 @@ public class Backend {
         Thread thread = new Thread(new Setup(this, backendFile), "Setup Thread");
         thread.start();
         setInSetUp(true);
+    }
+
+    public void runAsync(Runnable runnable) {
+        runAsyncCount++;
+        new Thread(runnable, "Run Async Thread #"+String.valueOf(runAsyncCount)).start();
     }
 }
