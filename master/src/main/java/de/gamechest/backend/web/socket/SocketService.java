@@ -2,15 +2,14 @@ package de.gamechest.backend.web.socket;
 
 import de.gamechest.backend.Backend;
 import de.gamechest.backend.log.BackendLogger;
-import de.gamechest.backend.sql.SqlLite;
+import de.gamechest.backend.web.socket.support.SupportDatabase;
+import de.gamechest.backend.web.socket.support.minecraft.MinecraftTable;
 import org.bson.Document;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Created by ByteList on 04.04.2018.
@@ -25,29 +24,18 @@ public class SocketService {
     private final int port;
     private final boolean local;
 
-    private SqlLite sqlLite;
+    private SupportDatabase database;
+    private MinecraftTable minecraftTable;
 
     public SocketService(BackendLogger logger, int port, boolean local) {
         this.logger = logger;
         this.port = port;
         this.local = local;
-        try {
-            this.sqlLite = new SqlLite("socketService");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.database = new SupportDatabase();
+        this.minecraftTable = this.database.getMinecraftTable();
     }
 
     public void startSocketServer(Backend backend) {
-        if(this.sqlLite.createTableIfNotExists("support (id string, tab string, creator string)")) {
-            System.out.println("SqlLite - SocketService support table created!");
-        }
-        if(this.sqlLite.createTableIfNotExists("mc (id string, player string, uuid string, version string, sid string, subject string, msg string, answers string)")) {
-            System.out.println("SqlLite - SocketService mc table created!");
-        }
-        if(this.sqlLite.createTableIfNotExists("mcanswers (id string, number string, answer string, timestamp string)")) {
-            System.out.println("SqlLite - SocketService mcanswers table created!");
-        }
         new Thread(()-> {
             ServerSocket server = null;
             try {
@@ -74,46 +62,22 @@ public class SocketService {
                             case "support":
                                 String tabShort = document.getString("tab");
                                 SupportTab supportTab = SupportTab.getSupportTab(tabShort);
+                                int action = document.getInteger("action");
+                                SupportAction supportAction = SupportAction.getSupportTab(action);
 
                                 switch (supportTab) {
                                     case MINECRAFT:
-                                        ResultSet resultSet = this.sqlLite.executeQuery("SELECT COUNT(id) AS rowcount FROM support");
-                                        int ticketId = -2;
-                                        String topic = document.getString("topic");
-                                        String creator = document.getString("creator");
-                                        String player = document.getString("player");
-                                        String uuid = document.getString("uuid");
-                                        String version = document.getString("mcv");
-                                        String serverId = document.getString("sid");
-                                        String subject = document.getString("subject");
-                                        String msg = document.getString("msg");
-
-                                        try {
-                                            while (resultSet.next()) {
-                                                ticketId = resultSet.getInt("rowcount")+1;
-                                            }
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        } finally {
-                                            try {
-                                                resultSet.close();
-                                            } catch (SQLException e) {
-                                                e.printStackTrace();
-                                            }
+                                        switch (supportAction) {
+                                            case CREATE:
+                                                send = createMC(document, send);
+                                                break;
+                                            case CHANGE_STATE:
+                                                send = changeStateMC(document, send);
+                                                break;
+                                            case ANSWER:
+                                                send = answerMC(document, send);
+                                                break;
                                         }
-
-                                        if(this.sqlLite.executeSupportInsert(ticketId, supportTab.getTabShort(), creator)) {
-                                            if(this.sqlLite.executeSupportInsertMinecraft(ticketId, player, uuid, version, serverId, subject, msg)) {
-                                                send.append("id", ticketId);
-                                                send.append("topic", topic);
-                                                send.append("creator", creator);
-                                            } else {
-                                                send.append("error", "executeSupportInsertMinecraft()");
-                                            }
-                                        } else {
-                                            send.append("error", "executeSupportInsert()");
-                                        }
-
                                         break;
                                     case WEBSITE:
                                         break;
@@ -145,11 +109,39 @@ public class SocketService {
     }
 
     public void stopSocketServer() {
-        if(sqlLite != null) {
-            if( this.sqlLite.close()) {
+        if(database != null) {
+            if( this.database.close()) {
                 System.out.println("SqlLite - SocketService closed!");
             }
         }
         System.out.println("Socket-Server stopped!");
+    }
+
+
+    private Document createMC(Document document, Document send) {
+        int ticketId = this.minecraftTable.count()+1;
+        String creator = document.getString("creator");
+        String topic = document.getString("topic");
+        String version = document.getString("mcv");
+        String serverId = document.getString("sid");
+        String subject = document.getString("subject");
+        String msg = document.getString("msg");
+
+
+        if(this.database.createMinecraftTicket(ticketId, creator, topic, version, serverId, subject, msg)) {
+            send.append("id", ticketId);
+        } else {
+            send.append("error", "createMinecraftTicket()");
+        }
+
+        return send;
+    }
+
+    private Document changeStateMC(Document document, Document send) {
+        return send;
+    }
+
+    private Document answerMC(Document document, Document send) {
+        return send;
     }
 }
