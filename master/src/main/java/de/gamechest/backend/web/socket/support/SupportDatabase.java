@@ -56,8 +56,8 @@ public class SupportDatabase extends SqlLiteDatabase {
                 Document document = new Document();
                 int id = resultSet.getInt("ticket_id");
                 document.append("id", id);
-                document.append("state", resultSet.getInt("state"));
-                document.append("tab", resultSet.getInt("tab"));
+                document.append("state", resultSet.getString("state"));
+                document.append("tab", resultSet.getString("tab"));
 
                 ResultSet tResultSet = this.executeQuery(this.minecraftTable.select(id));
                 while (tResultSet.next()) {
