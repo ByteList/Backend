@@ -147,7 +147,7 @@ public class SocketService {
         }
         id.append("#$");
         send.append("ids", id.toString().replace(",#$", ""));
-
+        System.out.println(id.toString().replace(",#$", ""));
         return send;
     }
 
