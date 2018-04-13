@@ -56,7 +56,7 @@ public class MinecraftAnswersTable implements SqlLiteTable {
     }
 
     public int countAnswers(int ticketId) {
-        ResultSet resultSet = this.database.executeQuery("SELECT COUNT(answer) AS rowcount FROM "+this.name+" WHERE ticket_id = "+String.valueOf(ticketId));
+        ResultSet resultSet = this.database.executeQuery("SELECT COUNT(answer) AS rowcount FROM "+this.name+" WHERE ticket_id = '"+String.valueOf(ticketId)+"'");
         int count = -1;
         try {
             while (resultSet.next()) {
