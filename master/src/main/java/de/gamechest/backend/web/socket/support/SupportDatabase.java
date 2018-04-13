@@ -61,7 +61,8 @@ public class SupportDatabase extends SqlLiteDatabase {
 
                 ResultSet tResultSet = this.executeQuery(this.minecraftTable.selectSubject(id));
                 while (tResultSet.next()) {
-                   document.append("subject", tResultSet.getString("subject"));
+                    document.append("subject", tResultSet.getString("subject"));
+                    document.append("topic", tResultSet.getString("topic"));
                 }
                 ids.add(document);
             }
