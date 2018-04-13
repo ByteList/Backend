@@ -156,7 +156,7 @@ public class SocketService {
     }
 
     private Document getTicket(Document document) {
-        int ticketId = document.getInteger("ticket_id");
+        int ticketId = Integer.valueOf(document.getString("ticket_id"));
         return this.database.getTicket(ticketId);
     }
 
