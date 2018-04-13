@@ -20,7 +20,7 @@ public class TicketsTable implements SqlLiteTable {
     private String name;
     private SqlLiteTableStructure structure;
 
-    public TicketsTable(SupportDatabase database) {
+    TicketsTable(SupportDatabase database) {
         this.database = database;
 
         this.name = "tickets";
@@ -53,7 +53,7 @@ public class TicketsTable implements SqlLiteTable {
         return count;
     }
 
-    public String insert(int ticketId, String tab, String creator, String state) {
+    String insert(int ticketId, String tab, String creator, String state) {
         String structure = this.structure.toValuesFormattedString();
         structure = structure
                 .replace("ticket_id", String.valueOf(ticketId))
@@ -64,7 +64,7 @@ public class TicketsTable implements SqlLiteTable {
         return "INSERT INTO "+this.name+" VALUES"+structure;
     }
 
-    public String selectTickets(String tab, String creator) {
+    String selectTickets(String tab, String creator) {
         String t = "tab = '"+tab+"'";
         String c = "creator = '"+creator+"'";
         return "SELECT ticket_id FROM "+this.name+" WHERE "+c+(tab != null ? " AND "+t : "");

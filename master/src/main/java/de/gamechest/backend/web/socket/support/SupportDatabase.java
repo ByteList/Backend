@@ -47,6 +47,9 @@ public class SupportDatabase extends SqlLiteDatabase {
 
     public ArrayList<Integer> getTicketIds(String creator) {
         String cmd = this.ticketsTable.selectTickets(null, creator);
+
+        System.out.println(cmd);
+
         ResultSet resultSet = this.executeQuery(cmd);
         ArrayList<Integer> ids = new ArrayList<>();
 
