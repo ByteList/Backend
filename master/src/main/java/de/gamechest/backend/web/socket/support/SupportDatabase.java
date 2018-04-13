@@ -87,13 +87,32 @@ public class SupportDatabase extends SqlLiteDatabase {
         try {
             while (resultSet.next()) {
                 document.append("state", resultSet.getString("state"));
-                document.append("tab", resultSet.getString("tab"));
+                String tab = resultSet.getString("tab");
+                document.append("tab", tab);
 
+                switch (SupportTab.getSupportTab(tab)) {
+                    case DEFAULT:
+                        break;
+                    case MINECRAFT:
+                        String[] keys = { "topic", "version", "server_id", "subject", "message" };
 
-                ResultSet tResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
-                while (tResultSet.next()) {
-                    document.append(tResultSet.getCursorName(), tResultSet.getString(tResultSet.getCursorName()));
+                        ResultSet tResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
+                        while (tResultSet.next()) {
+                            for (String key : keys) {
+                                document.append(key, tResultSet.getString(key));
+                            }
+                        }
+                        break;
+                    case WEBSITE:
+                        break;
+                    case TEAMSPEAK:
+                        break;
+                    case DISCORD:
+                        break;
+                    case ANYTHING:
+                        break;
                 }
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
