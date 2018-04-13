@@ -12,7 +12,7 @@ import de.gamechest.backend.mail.client.MailClient;
 import de.gamechest.backend.setup.Setup;
 import de.gamechest.backend.updater.Updater;
 import de.gamechest.backend.web.WebService;
-import de.gamechest.backend.web.socket.SocketService;
+import de.gamechest.backend.socket.SocketService;
 import jline.console.ConsoleReader;
 import lombok.Getter;
 import lombok.Setter;

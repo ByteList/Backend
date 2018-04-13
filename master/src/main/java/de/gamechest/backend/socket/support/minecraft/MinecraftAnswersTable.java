@@ -1,8 +1,8 @@
-package de.gamechest.backend.web.socket.support.minecraft;
+package de.gamechest.backend.socket.support.minecraft;
 
 import de.gamechest.backend.sql.SqlLiteTable;
 import de.gamechest.backend.sql.SqlLiteTableStructure;
-import de.gamechest.backend.web.socket.support.SupportDatabase;
+import de.gamechest.backend.socket.support.SupportDatabase;
 import lombok.Data;
 
 import java.sql.ResultSet;
@@ -56,7 +56,7 @@ public class MinecraftAnswersTable implements SqlLiteTable {
     }
 
     public int countAnswers(int ticketId) {
-        ResultSet resultSet = this.database.executeQuery("SELECT COUNT(ticket_id) AS rowcount FROM "+this.name+" WHERE ticket_id = "+String.valueOf(ticketId));
+        ResultSet resultSet = this.database.executeQuery("SELECT COUNT(answer) AS rowcount FROM "+this.name+" WHERE ticket_id = "+String.valueOf(ticketId));
         int count = -1;
         try {
             while (resultSet.next()) {

@@ -1,4 +1,4 @@
-package de.gamechest.backend.web.socket;
+package de.gamechest.backend.socket;
 
 import lombok.Getter;
 

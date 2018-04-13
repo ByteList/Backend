@@ -1,9 +1,9 @@
-package de.gamechest.backend.web.socket;
+package de.gamechest.backend.socket;
 
 import de.gamechest.backend.Backend;
 import de.gamechest.backend.log.BackendLogger;
-import de.gamechest.backend.web.socket.support.SupportDatabase;
-import de.gamechest.backend.web.socket.support.minecraft.MinecraftTable;
+import de.gamechest.backend.socket.support.SupportDatabase;
+import de.gamechest.backend.socket.support.minecraft.MinecraftTable;
 import org.bson.Document;
 
 import java.io.*;

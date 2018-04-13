@@ -1,4 +1,4 @@
-package de.gamechest.backend.web.socket.support;
+package de.gamechest.backend.socket.support;
 
 import de.gamechest.backend.sql.SqlLiteTable;
 import de.gamechest.backend.sql.SqlLiteTableStructure;

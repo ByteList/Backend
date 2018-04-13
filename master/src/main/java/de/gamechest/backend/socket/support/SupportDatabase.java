@@ -1,10 +1,10 @@
-package de.gamechest.backend.web.socket.support;
+package de.gamechest.backend.socket.support;
 
 import de.gamechest.backend.sql.SqlLiteDatabase;
-import de.gamechest.backend.web.socket.SupportState;
-import de.gamechest.backend.web.socket.SupportTab;
-import de.gamechest.backend.web.socket.support.minecraft.MinecraftAnswersTable;
-import de.gamechest.backend.web.socket.support.minecraft.MinecraftTable;
+import de.gamechest.backend.socket.SupportState;
+import de.gamechest.backend.socket.SupportTab;
+import de.gamechest.backend.socket.support.minecraft.MinecraftAnswersTable;
+import de.gamechest.backend.socket.support.minecraft.MinecraftTable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.Document;
