@@ -144,7 +144,7 @@ public class SocketService {
         ArrayList<Document> ids = this.database.getTicketIds(creator);
         int i = 0;
         for (Document d : ids) {
-            send.append(String.valueOf(i), d.toJson());
+            send.append(String.valueOf(i), d);
             i++;
         }
         return send;
