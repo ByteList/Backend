@@ -81,6 +81,9 @@ public class SocketService {
                                                 case GET_TICKETS:
                                                     send = getTicketsDefault(document, send);
                                                     break;
+                                                case GET_TICKET:
+                                                    send.append("error", "wrong action");
+                                                    break;
                                             }
                                             break;
                                         case MINECRAFT:
@@ -96,6 +99,9 @@ public class SocketService {
                                                     break;
                                                 case GET_TICKETS:
                                                     send.append("error", "wrong action");
+                                                    break;
+                                                case GET_TICKET:
+                                                    send = getTicketMC(document);
                                                     break;
                                             }
                                             break;
@@ -147,6 +153,11 @@ public class SocketService {
             i++;
         }
         return send;
+    }
+
+    private Document getTicketMC(Document document) {
+        int ticketId = document.getInteger("ticket_id");
+        return this.database.getMinecraftTicket(ticketId);
     }
 
     private Document createMC(Document document, Document send) {

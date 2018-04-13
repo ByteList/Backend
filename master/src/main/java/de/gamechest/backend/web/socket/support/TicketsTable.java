@@ -69,4 +69,8 @@ public class TicketsTable implements SqlLiteTable {
         String c = "creator = '"+creator+"'";
         return "SELECT * FROM "+this.name+" WHERE "+c+(tab != null ? " AND "+t : "");
     }
+
+    String selectTicket(int ticketId) {
+        return "SELECT * FROM "+this.name+" WHERE ticket_id = '"+ticketId+"'";
+    }
 }

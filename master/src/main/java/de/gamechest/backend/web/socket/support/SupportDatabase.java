@@ -77,4 +77,32 @@ public class SupportDatabase extends SqlLiteDatabase {
         }
         return ids;
     }
+
+    public Document getMinecraftTicket(int ticketId) {
+        Document document = new Document();
+        String cmd = this.ticketsTable.selectTicket(ticketId);
+        ResultSet resultSet = this.executeQuery(cmd);
+
+        document.append("id", ticketId);
+        try {
+            while (resultSet.next()) {
+                document.append("state", resultSet.getString("state"));
+                document.append("tab", resultSet.getString("tab"));
+
+                ResultSet tResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
+                while (tResultSet.next()) {
+                    document.append(tResultSet.getCursorName(), tResultSet.getString(tResultSet.getCursorName()));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return document;
+    }
 }

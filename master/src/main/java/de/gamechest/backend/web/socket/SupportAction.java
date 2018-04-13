@@ -12,7 +12,8 @@ public enum SupportAction {
     CREATE(0),
     CHANGE_STATE(1),
     ANSWER(2),
-    GET_TICKETS(3);
+    GET_TICKETS(3),
+    GET_TICKET(4);
 
     @Getter
     private int action;
