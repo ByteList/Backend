@@ -86,8 +86,10 @@ public class SupportDatabase extends SqlLiteDatabase {
         document.append("id", ticketId);
         try {
             while (resultSet.next()) {
-                document.append("state", resultSet.getString("state"));
                 String tab = resultSet.getString("tab");
+
+                document.append("state", resultSet.getString("state"));
+                document.append("creator", resultSet.getString("creator"));
                 document.append("tab", tab);
 
                 switch (SupportTab.getSupportTab(tab)) {
