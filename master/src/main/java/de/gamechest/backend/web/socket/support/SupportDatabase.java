@@ -78,7 +78,7 @@ public class SupportDatabase extends SqlLiteDatabase {
         return ids;
     }
 
-    public Document getMinecraftTicket(int ticketId) {
+    public Document getTicket(int ticketId) {
         Document document = new Document();
         String cmd = this.ticketsTable.selectTicket(ticketId);
         ResultSet resultSet = this.executeQuery(cmd);
@@ -88,6 +88,7 @@ public class SupportDatabase extends SqlLiteDatabase {
             while (resultSet.next()) {
                 document.append("state", resultSet.getString("state"));
                 document.append("tab", resultSet.getString("tab"));
+
 
                 ResultSet tResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
                 while (tResultSet.next()) {

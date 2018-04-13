@@ -82,7 +82,7 @@ public class SocketService {
                                                     send = getTicketsDefault(document, send);
                                                     break;
                                                 case GET_TICKET:
-                                                    send.append("error", "wrong action");
+                                                    send = getTicket(document);
                                                     break;
                                             }
                                             break;
@@ -101,7 +101,7 @@ public class SocketService {
                                                     send.append("error", "wrong action");
                                                     break;
                                                 case GET_TICKET:
-                                                    send = getTicketMC(document);
+                                                    send = getTicket(document);
                                                     break;
                                             }
                                             break;
@@ -155,9 +155,9 @@ public class SocketService {
         return send;
     }
 
-    private Document getTicketMC(Document document) {
+    private Document getTicket(Document document) {
         int ticketId = document.getInteger("ticket_id");
-        return this.database.getMinecraftTicket(ticketId);
+        return this.database.getTicket(ticketId);
     }
 
     private Document createMC(Document document, Document send) {
