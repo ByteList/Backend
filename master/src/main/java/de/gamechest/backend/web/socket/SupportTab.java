@@ -9,6 +9,7 @@ import lombok.Getter;
  */
 public enum SupportTab {
 
+    DEFAULT("default"),
     MINECRAFT("mc"),
     WEBSITE("web"),
     TEAMSPEAK("ts"),

@@ -10,6 +10,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * Created by ByteList on 04.04.2018.
@@ -66,6 +67,22 @@ public class SocketService {
                                     SupportAction supportAction = SupportAction.getSupportTab(Integer.valueOf(action));
 
                                     switch (supportTab) {
+                                        case DEFAULT:
+                                            switch (supportAction) {
+                                                case CREATE:
+                                                    send.append("error", "wrong action");
+                                                    break;
+                                                case CHANGE_STATE:
+                                                    send.append("error", "wrong action");
+                                                    break;
+                                                case ANSWER:
+                                                    send.append("error", "wrong action");
+                                                    break;
+                                                case GET_TICKETS:
+                                                    send = getTicketsDefault(document, send);
+                                                    break;
+                                            }
+                                            break;
                                         case MINECRAFT:
                                             switch (supportAction) {
                                                 case CREATE:
@@ -76,6 +93,9 @@ public class SocketService {
                                                     break;
                                                 case ANSWER:
                                                     send = answerMC(document, send);
+                                                    break;
+                                                case GET_TICKETS:
+                                                    send.append("error", "wrong action");
                                                     break;
                                             }
                                             break;
@@ -118,6 +138,18 @@ public class SocketService {
         System.out.println("Socket-Server stopped!");
     }
 
+    private Document getTicketsDefault(Document document, Document send) {
+        String creator = document.getString("creator");
+        ArrayList<Integer> ids = this.database.getTicketIds(creator);
+        StringBuilder id = new StringBuilder();
+        for (int i : ids) {
+            id.append(i).append(",");
+        }
+        id.append("#$");
+        send.append("ids", id.toString().replace(",#$", ""));
+
+        return send;
+    }
 
     private Document createMC(Document document, Document send) {
         int ticketId = this.minecraftTable.count() + 1;

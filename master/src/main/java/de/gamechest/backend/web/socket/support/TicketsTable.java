@@ -63,4 +63,10 @@ public class TicketsTable implements SqlLiteTable {
 
         return "INSERT INTO "+this.name+" VALUES"+structure;
     }
+
+    public String selectTickets(String tab, String creator) {
+        String t = "tab = '"+tab+"'";
+        String c = "creator = '"+creator+"'";
+        return "SELECT ticket_id FROM "+this.name+" WHERE "+c+(tab != null ? " AND "+t : "");
+    }
 }

@@ -8,6 +8,10 @@ import de.gamechest.backend.web.socket.support.minecraft.MinecraftTable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 /**
  * Created by ByteList on 08.04.2018.
  * <p>
@@ -39,5 +43,26 @@ public class SupportDatabase extends SqlLiteDatabase {
             return this.executeUpdate(mcAnswersCmd);
         }
         return false;
+    }
+
+    public ArrayList<Integer> getTicketIds(String creator) {
+        String cmd = this.ticketsTable.selectTickets(null, creator);
+        ResultSet resultSet = this.executeQuery(cmd);
+        ArrayList<Integer> ids = new ArrayList<>();
+
+        try {
+            while (resultSet.next()) {
+                ids.add(resultSet.getInt("ticket_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return ids;
     }
 }
