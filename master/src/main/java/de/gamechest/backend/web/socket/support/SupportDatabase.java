@@ -141,4 +141,9 @@ public class SupportDatabase extends SqlLiteDatabase {
         }
         return document;
     }
+
+    public boolean answer(int ticketId, String user, String msg) {
+        String mcAnswersCmd = this.minecraftAnswersTable.insert(ticketId, user, msg);
+        return this.executeUpdate(mcAnswersCmd);
+    }
 }

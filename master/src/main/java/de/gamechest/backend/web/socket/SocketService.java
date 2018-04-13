@@ -76,7 +76,7 @@ public class SocketService {
                                                     send.append("error", "wrong action");
                                                     break;
                                                 case ANSWER:
-                                                    send.append("error", "wrong action");
+                                                    send = answer(document, send);
                                                     break;
                                                 case GET_TICKETS:
                                                     send = getTicketsDefault(document, send);
@@ -95,7 +95,7 @@ public class SocketService {
                                                     send = changeStateMC(document, send);
                                                     break;
                                                 case ANSWER:
-                                                    send = answerMC(document, send);
+                                                    send.append("error", "wrong action");
                                                     break;
                                                 case GET_TICKETS:
                                                     send.append("error", "wrong action");
@@ -158,6 +158,20 @@ public class SocketService {
     private Document getTicket(Document document) {
         int ticketId = Integer.valueOf(document.getString("ticket_id"));
         return this.database.getTicket(ticketId);
+    }
+
+    private Document answer(Document document, Document send) {
+        int ticketId = Integer.valueOf(document.getString("ticket_id"));
+        String user = document.getString("user");
+        String msg = document.getString("message");
+
+        if(this.database.answer(ticketId, user, msg)) {
+            send.append("id", ticketId);
+        } else {
+            send.append("error", "answer()");
+        }
+
+        return send;
     }
 
     private Document createMC(Document document, Document send) {
