@@ -64,6 +64,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                     document.append("subject", tResultSet.getString("subject"));
                     document.append("topic", tResultSet.getString("topic"));
                 }
+                tResultSet.close();
                 ids.add(document);
             }
         } catch (SQLException e) {
@@ -91,12 +92,14 @@ public class SupportDatabase extends SqlLiteDatabase {
                 document.append("state", resultSet.getString("state"));
                 document.append("creator", resultSet.getString("creator"));
                 document.append("tab", tab);
+                ArrayList<Document> answers = new ArrayList<>();
 
                 switch (SupportTab.getSupportTab(tab)) {
                     case DEFAULT:
                         break;
                     case MINECRAFT:
                         String[] keys = { "topic", "version", "server_id", "subject", "message" };
+                        String[] keysAnswers = { "answer", "user", "message", "timestamp" };
 
                         ResultSet tResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
                         while (tResultSet.next()) {
@@ -104,6 +107,16 @@ public class SupportDatabase extends SqlLiteDatabase {
                                 document.append(key, tResultSet.getString(key));
                             }
                         }
+                        tResultSet.close();
+                        tResultSet = this.executeQuery(this.minecraftAnswersTable.select(ticketId));
+                        while (tResultSet.next()) {
+                            Document answer = new Document();
+                            for (String key : keysAnswers) {
+                                answer.append(key, tResultSet.getString(key));
+                            }
+                            answers.add(answer);
+                        }
+                        tResultSet.close();
                         break;
                     case WEBSITE:
                         break;
@@ -114,6 +127,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                     case ANYTHING:
                         break;
                 }
+                document.append("answers", answers);
 
             }
         } catch (SQLException e) {

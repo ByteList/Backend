@@ -85,4 +85,8 @@ public class MinecraftAnswersTable implements SqlLiteTable {
 
         return "INSERT INTO "+this.name+" VALUES"+structure;
     }
+
+    public String select(int ticketId) {
+        return "SELECT * FROM "+this.name+" WHERE ticket_id = '"+ticketId+"'";
+    }
 }
