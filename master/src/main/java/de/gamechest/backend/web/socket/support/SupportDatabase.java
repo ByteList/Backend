@@ -7,6 +7,7 @@ import de.gamechest.backend.web.socket.support.minecraft.MinecraftAnswersTable;
 import de.gamechest.backend.web.socket.support.minecraft.MinecraftTable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.bson.Document;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,17 +46,24 @@ public class SupportDatabase extends SqlLiteDatabase {
         return false;
     }
 
-    public ArrayList<Integer> getTicketIds(String creator) {
+    public ArrayList<Document> getTicketIds(String creator) {
         String cmd = this.ticketsTable.selectTickets(null, creator);
-
-        System.out.println(cmd);
-
         ResultSet resultSet = this.executeQuery(cmd);
-        ArrayList<Integer> ids = new ArrayList<>();
+        ArrayList<Document> ids = new ArrayList<>();
 
         try {
             while (resultSet.next()) {
-                ids.add(resultSet.getInt("ticket_id"));
+                Document document = new Document();
+                int id = resultSet.getInt("ticket_id");
+                document.append("id", id);
+                document.append("state", resultSet.getInt("state"));
+                document.append("tab", resultSet.getInt("tab"));
+
+                ResultSet tResultSet = this.executeQuery(this.minecraftTable.selectSubject(id));
+                while (tResultSet.next()) {
+                   document.append("subject", tResultSet.getString("subject"));
+                }
+                ids.add(document);
             }
         } catch (SQLException e) {
             e.printStackTrace();

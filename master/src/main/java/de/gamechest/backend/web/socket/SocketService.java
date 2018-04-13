@@ -140,14 +140,12 @@ public class SocketService {
 
     private Document getTicketsDefault(Document document, Document send) {
         String creator = document.getString("creator");
-        ArrayList<Integer> ids = this.database.getTicketIds(creator);
-        StringBuilder id = new StringBuilder();
-        for (int i : ids) {
-            id.append(i).append(",");
+        ArrayList<Document> ids = this.database.getTicketIds(creator);
+        int i = 0;
+        for (Document d : ids) {
+            send.append(String.valueOf(i), d.toJson());
+            i++;
         }
-        id.append("#$");
-        send.append("ids", id.toString().replace(",#$", ""));
-        System.out.println(id.toString().replace(",#$", ""));
         return send;
     }
 

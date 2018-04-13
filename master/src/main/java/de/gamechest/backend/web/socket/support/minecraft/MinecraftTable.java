@@ -74,4 +74,8 @@ public class MinecraftTable implements SqlLiteTable {
 
         return "INSERT INTO "+this.name+" VALUES"+structure;
     }
+
+    public String selectSubject(int ticketId) {
+        return "SELECT subject FROM "+this.name+" WHERE ticket_id = '"+ticketId+"'";
+    }
 }
