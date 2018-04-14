@@ -74,7 +74,7 @@ public class WebService {
                 new HashMap<>(findCache).forEach((url, cached) -> {
                     long timestamp = cached.getTimestamp() / 1000;
 
-                    if(timestamp + 15*60 > currentSeconds) {
+                    if(currentSeconds > timestamp + 15) {
                         findCache.remove(url);
                         System.out.println("removed : "+ url);
                     }
