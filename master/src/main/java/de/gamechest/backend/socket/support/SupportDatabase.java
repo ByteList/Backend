@@ -1,10 +1,11 @@
 package de.gamechest.backend.socket.support;
 
-import de.gamechest.backend.sql.SqlLiteDatabase;
+import de.gamechest.backend.Backend;
 import de.gamechest.backend.socket.SupportState;
 import de.gamechest.backend.socket.SupportTab;
 import de.gamechest.backend.socket.support.minecraft.AnswersTable;
 import de.gamechest.backend.socket.support.minecraft.MinecraftTable;
+import de.gamechest.backend.sql.SqlLiteDatabase;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.Document;
@@ -101,22 +102,34 @@ public class SupportDatabase extends SqlLiteDatabase {
                         String[] keys = { "topic", "version", "server_id", "subject", "message" };
                         String[] keysAnswers = { "answer", "user", "message", "timestamp" };
 
-                        ResultSet tResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
-                        while (tResultSet.next()) {
-                            for (String key : keys) {
-                                document.append(key, tResultSet.getString(key));
-                            }
+                        ResultSet mcResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
+                        while (mcResultSet.next()) {
+                            Backend.getInstance().runAsync(()-> {
+                                for (String key : keys) {
+                                    try {
+                                        document.append(key, mcResultSet.getString(key));
+                                    } catch (SQLException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
                         }
-                        tResultSet.close();
-                        tResultSet = this.executeQuery(this.answersTable.select(ticketId));
-                        while (tResultSet.next()) {
-                            Document answer = new Document();
-                            for (String key : keysAnswers) {
-                                answer.append(key, tResultSet.getString(key));
-                            }
-                            answers.add(answer);
+                        mcResultSet.close();
+                        ResultSet answerResultSet = this.executeQuery(this.answersTable.select(ticketId));
+                        while (answerResultSet.next()) {
+                            Backend.getInstance().runAsync(()-> {
+                                Document answer = new Document();
+                                for (String key : keysAnswers) {
+                                    try {
+                                        answer.append(key, answerResultSet.getString(key));
+                                    } catch (SQLException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                answers.add(answer);
+                            });
                         }
-                        tResultSet.close();
+                        answerResultSet.close();
                         break;
                     case WEBSITE:
                         break;
