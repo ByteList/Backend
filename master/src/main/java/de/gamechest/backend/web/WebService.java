@@ -56,7 +56,7 @@ public class WebService {
     private final String METHOD_OPTIONS = "OPTIONS";
     private final String ALLOWED_METHODS = METHOD_GET + "," + METHOD_OPTIONS;
 
-    private final HashMap<String, Cached<FindIterable<Document>>> findCache = new HashMap<>();
+    private final HashMap<String, Cached<Document>> findCache = new HashMap<>();
 
     public WebService(BackendLogger logger, int port, boolean local) {
         this.logger = logger;
@@ -72,7 +72,7 @@ public class WebService {
                 long currentSeconds = System.currentTimeMillis() / 1000;
 
                 new HashMap<>(findCache).forEach((url, cached) -> {
-                    long timestamp = cached.getTimestamp() + 15;
+                    long timestamp = cached.getTimestamp() / 1000 + 15;
 
                     if(timestamp > currentSeconds) {
                         findCache.remove(url);
@@ -123,7 +123,7 @@ public class WebService {
                                             String url = httpExchange.getRequestURI().toString();
 
                                             if(findCache.containsKey(url)) {
-                                                find = findCache.get(url).getCached();
+                                                first = findCache.get(url).getCached();
                                                 logger.info("[W "+httpExchange.getRemoteAddress().toString()+" | cached] "+httpExchange.getRequestURI().toString());
                                             } else {
                                                 logger.info("[W "+httpExchange.getRemoteAddress().toString()+"] "+httpExchange.getRequestURI().toString());
@@ -174,40 +174,41 @@ public class WebService {
                                                         collection.updateOne(basicDBObject, uDoc);
                                                     }
                                                 }
-                                                findCache.put(url, new Cached<>(find));
-                                            }
 
-                                            Document doc = new Document();
-                                            final int[] i = {0};
+                                                Document doc = new Document();
+                                                final int[] i = {0};
 
-                                            switch (jsonCoding) {
-                                                case NORMAL:
-                                                    find.forEach((Block<? super Document>) document -> {
-                                                        document.remove("_id");
-                                                        doc.append(String.valueOf(i[0]++), document);
-                                                    });
-                                                    break;
-                                                case STRING:
-                                                    find.forEach((Block<? super Document>) document -> {
-                                                        document.remove("_id");
-
-                                                        Document stringed = new Document();
-                                                        document.forEach((s, o) -> {
-                                                            if(o instanceof Document) {
-                                                                stringed.append(s,((Document) o).toJson());
-                                                            } else {
-                                                                stringed.append(s, (o == null ? "null" : o.toString()));
-                                                            }
+                                                switch (jsonCoding) {
+                                                    case NORMAL:
+                                                        find.forEach((Block<? super Document>) document -> {
+                                                            document.remove("_id");
+                                                            doc.append(String.valueOf(i[0]++), document);
                                                         });
+                                                        break;
+                                                    case STRING:
+                                                        find.forEach((Block<? super Document>) document -> {
+                                                            document.remove("_id");
 
-                                                        doc.append(String.valueOf(i[0]++), stringed);
+                                                            Document stringed = new Document();
+                                                            document.forEach((s, o) -> {
+                                                                if(o instanceof Document) {
+                                                                    stringed.append(s,((Document) o).toJson());
+                                                                } else {
+                                                                    stringed.append(s, (o == null ? "null" : o.toString()));
+                                                                }
+                                                            });
 
-                                                    });
-                                                    break;
+                                                            doc.append(String.valueOf(i[0]++), stringed);
+
+                                                        });
+                                                        break;
+                                                }
+
+                                                first = doc;
+                                                first.append("size", i[0]);
+
+                                                findCache.put(url, new Cached<>(first));
                                             }
-
-                                            first = doc;
-                                            first.append("size", i[0]);
 
                                         } catch (Exception ex) {
                                             first = new Document("db", dbId+"{"+dbName+"}").append("error", ex.getClass().getSimpleName()).append("msg", ex.getMessage());
