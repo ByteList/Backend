@@ -14,17 +14,17 @@ import java.sql.SQLException;
  * Copyright by ByteList - https://bytelist.de/
  */
 @Data
-public class MinecraftAnswersTable implements SqlLiteTable {
+public class AnswersTable implements SqlLiteTable {
 
     private final SupportDatabase database;
 
     private String name;
     private SqlLiteTableStructure structure;
 
-    public MinecraftAnswersTable(SupportDatabase database) {
+    public AnswersTable(SupportDatabase database) {
         this.database = database;
 
-        this.name = "mcanswers";
+        this.name = "answers";
         this.structure = new SqlLiteTableStructure()
                 .append("ticket_id")
                 .append("answer")

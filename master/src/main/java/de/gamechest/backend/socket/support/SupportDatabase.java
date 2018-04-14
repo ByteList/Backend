@@ -3,7 +3,7 @@ package de.gamechest.backend.socket.support;
 import de.gamechest.backend.sql.SqlLiteDatabase;
 import de.gamechest.backend.socket.SupportState;
 import de.gamechest.backend.socket.SupportTab;
-import de.gamechest.backend.socket.support.minecraft.MinecraftAnswersTable;
+import de.gamechest.backend.socket.support.minecraft.AnswersTable;
 import de.gamechest.backend.socket.support.minecraft.MinecraftTable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,7 +24,7 @@ public class SupportDatabase extends SqlLiteDatabase {
 
     private final TicketsTable ticketsTable;
     private final MinecraftTable minecraftTable;
-    private final MinecraftAnswersTable minecraftAnswersTable;
+    private final AnswersTable answersTable;
 
 
     public SupportDatabase() {
@@ -32,13 +32,13 @@ public class SupportDatabase extends SqlLiteDatabase {
         this.addNewTable(this.ticketsTable = new TicketsTable(this));
 
         this.addNewTable(this.minecraftTable = new MinecraftTable(this));
-        this.addNewTable(this.minecraftAnswersTable = new MinecraftAnswersTable(this));
+        this.addNewTable(this.answersTable = new AnswersTable(this));
     }
 
     public boolean createMinecraftTicket(int ticketId, String creator, String topic, String version, String serverId, String subject, String msg) {
         String ticketsCmd = this.ticketsTable.insert(ticketId, SupportTab.MINECRAFT.getTabShort(), creator, SupportState.OPEN.getStateString());
         String mcCmd = this.minecraftTable.insert(ticketId, topic, version, serverId, subject, msg);
-        String mcAnswersCmd = this.minecraftAnswersTable.insert(ticketId, "system", "created");
+        String mcAnswersCmd = this.answersTable.insert(ticketId, "system", "created");
 
         if(this.executeUpdate(ticketsCmd) && this.executeUpdate(mcCmd)) {
             return this.executeUpdate(mcAnswersCmd);
@@ -84,11 +84,11 @@ public class SupportDatabase extends SqlLiteDatabase {
         String cmd = this.ticketsTable.selectTicket(ticketId);
         ResultSet resultSet = this.executeQuery(cmd);
 
-        document.append("id", ticketId);
         try {
             while (resultSet.next()) {
                 String tab = resultSet.getString("tab");
 
+                document.append("id", ticketId);
                 document.append("state", resultSet.getString("state"));
                 document.append("creator", resultSet.getString("creator"));
                 document.append("tab", tab);
@@ -108,7 +108,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                             }
                         }
                         tResultSet.close();
-                        tResultSet = this.executeQuery(this.minecraftAnswersTable.select(ticketId));
+                        tResultSet = this.executeQuery(this.answersTable.select(ticketId));
                         while (tResultSet.next()) {
                             Document answer = new Document();
                             for (String key : keysAnswers) {
@@ -139,11 +139,15 @@ public class SupportDatabase extends SqlLiteDatabase {
                 e.printStackTrace();
             }
         }
+
+        if(!document.containsKey("id")) {
+            document.append("id", "-2");
+        }
         return document;
     }
 
     public boolean answer(int ticketId, String user, String msg) {
-        String mcAnswersCmd = this.minecraftAnswersTable.insert(ticketId, user, msg);
+        String mcAnswersCmd = this.answersTable.insert(ticketId, user, msg);
         return this.executeUpdate(mcAnswersCmd);
     }
 }
