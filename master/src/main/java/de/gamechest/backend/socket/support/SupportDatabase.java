@@ -78,6 +78,40 @@ public class SupportDatabase extends SqlLiteDatabase {
         }
         return ids;
     }
+    public ArrayList<Document> getTicketIdsFromState(String state, String creator) {
+        String cmd = this.ticketsTable.selectTicketsFromState(state, creator);
+        ResultSet resultSet = this.executeQuery(cmd);
+        ArrayList<Document> ids = new ArrayList<>();
+
+        try {
+            while (resultSet.next()) {
+                Document document = new Document();
+                int id = resultSet.getInt("ticket_id");
+                document.append("id", id);
+                document.append("creator", resultSet.getString("creator"));
+                document.append("state", resultSet.getString("state"));
+                document.append("tab", resultSet.getString("tab"));
+
+                ResultSet tResultSet = this.executeQuery(this.minecraftTable.select(id));
+                while (tResultSet.next()) {
+                    document.append("subject", tResultSet.getString("subject"));
+                    document.append("topic", tResultSet.getString("topic"));
+                }
+                tResultSet.close();
+                ids.add(document);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return ids;
+    }
+
 
     public Document getTicket(int ticketId) {
         Document document = new Document();

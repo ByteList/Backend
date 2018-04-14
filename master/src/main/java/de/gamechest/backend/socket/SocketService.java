@@ -79,7 +79,11 @@ public class SocketService {
                                                     send = answer(document, send);
                                                     break;
                                                 case GET_TICKETS:
-                                                    send = getTicketsDefault(document, send);
+                                                    if(document.containsKey("tickets_state")) {
+                                                        send = getTicketsFromState(document, send);
+                                                    } else {
+                                                        send = getTicketsDefault(document, send);
+                                                    }
                                                     break;
                                                 case GET_TICKET:
                                                     send = getTicket(document);
@@ -148,6 +152,19 @@ public class SocketService {
     private Document getTicketsDefault(Document document, Document send) {
         String creator = document.getString("creator");
         ArrayList<Document> ids = this.database.getTicketIds(creator);
+        int i = 0;
+        for (Document d : ids) {
+            send.append(String.valueOf(i), d);
+            i++;
+        }
+        return send;
+    }
+
+    private Document getTicketsFromState(Document document, Document send) {
+        String state = document.getString("tickets_state");
+        String creator = document.containsKey("creator") ? document.getString("creator") : null;
+
+        ArrayList<Document> ids = this.database.getTicketIdsFromState(state, creator);
         int i = 0;
         for (Document d : ids) {
             send.append(String.valueOf(i), d);
