@@ -10,7 +10,7 @@ import lombok.Getter;
 public enum SupportState {
 
     OPEN("open"),
-    IN_PROGRESSING("in_progressing"),
+    IN_PROGRESSING("progressing"),
     CLOSED("closed");
 
     @Getter
@@ -18,5 +18,14 @@ public enum SupportState {
 
     SupportState(String state) {
         this.stateString = state;
+    }
+
+    public static SupportState getSupportState(String state) {
+        for (SupportState supportState : values()) {
+            if(supportState.getStateString().equalsIgnoreCase(state)) {
+                return supportState;
+            }
+        }
+        throw new NullPointerException(state+" doesn't exist!");
     }
 }

@@ -73,4 +73,8 @@ public class TicketsTable implements SqlLiteTable {
     String selectTicket(int ticketId) {
         return "SELECT * FROM "+this.name+" WHERE ticket_id = '"+ticketId+"'";
     }
+
+    public String updateState(int ticketId, String state) {
+        return "UPDATE "+this.name+" SET state = '"+state+"' WHERE ticket_id = '"+ticketId+"';";
+    }
 }

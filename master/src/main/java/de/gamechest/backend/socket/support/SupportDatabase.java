@@ -147,6 +147,17 @@ public class SupportDatabase extends SqlLiteDatabase {
     }
 
     public boolean answer(int ticketId, String user, String msg) {
+        if(msg.startsWith("state:")) {
+            String state = msg.replace("state:", "");
+            try {
+                SupportState supportState = SupportState.getSupportState(state);
+                String stateUpdateCmd = this.ticketsTable.updateState(ticketId, supportState.getStateString());
+                this.executeUpdate(stateUpdateCmd);
+            } catch (NullPointerException ex) {
+                return false;
+            }
+        }
+
         String mcAnswersCmd = this.answersTable.insert(ticketId, user, msg);
         return this.executeUpdate(mcAnswersCmd);
     }
