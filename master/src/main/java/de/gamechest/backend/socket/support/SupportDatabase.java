@@ -41,7 +41,7 @@ public class SupportDatabase extends SqlLiteDatabase {
         String mcCmd = this.minecraftTable.insert(ticketId, topic, version, serverId, subject, msg);
         String mcAnswersCmd = this.answersTable.insert(ticketId, "system", "created");
 
-        if(this.executeUpdate(ticketsCmd) && this.executeUpdate(mcCmd)) {
+        if (this.executeUpdate(ticketsCmd) && this.executeUpdate(mcCmd)) {
             return this.executeUpdate(mcAnswersCmd);
         }
         return false;
@@ -99,37 +99,47 @@ public class SupportDatabase extends SqlLiteDatabase {
                     case DEFAULT:
                         break;
                     case MINECRAFT:
-                        String[] keys = { "topic", "version", "server_id", "subject", "message" };
-                        String[] keysAnswers = { "answer", "user", "message", "timestamp" };
+                        String[] keys = {"topic", "version", "server_id", "subject", "message"};
+                        String[] keysAnswers = {"answer", "user", "message", "timestamp"};
 
-                        ResultSet mcResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
-                        while (mcResultSet.next()) {
-                            Backend.getInstance().runAsync(()-> {
-                                for (String key : keys) {
-                                    try {
+                        Backend.getInstance().runAsync(() -> {
+                            ResultSet mcResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
+                            try {
+                                while (mcResultSet.next()) {
+                                    for (String key : keys) {
                                         document.append(key, mcResultSet.getString(key));
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
                                     }
                                 }
-                            });
-                        }
-                        mcResultSet.close();
-                        ResultSet answerResultSet = this.executeQuery(this.answersTable.select(ticketId));
-                        while (answerResultSet.next()) {
-                            Backend.getInstance().runAsync(()-> {
-                                Document answer = new Document();
-                                for (String key : keysAnswers) {
-                                    try {
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                            } finally {
+                                try {
+                                    mcResultSet.close();
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        Backend.getInstance().runAsync(() -> {
+                            ResultSet answerResultSet = this.executeQuery(this.answersTable.select(ticketId));
+                            try {
+                                while (answerResultSet.next()) {
+                                    Document answer = new Document();
+                                    for (String key : keysAnswers) {
                                         answer.append(key, answerResultSet.getString(key));
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
                                     }
+                                    answers.add(answer);
                                 }
-                                answers.add(answer);
-                            });
-                        }
-                        answerResultSet.close();
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                            } finally {
+                                try {
+                                    answerResultSet.close();
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
                         break;
                     case WEBSITE:
                         break;
@@ -153,14 +163,14 @@ public class SupportDatabase extends SqlLiteDatabase {
             }
         }
 
-        if(!document.containsKey("id")) {
+        if (!document.containsKey("id")) {
             document.append("id", "-2");
         }
         return document;
     }
 
     public boolean answer(int ticketId, String user, String msg) {
-        if(msg.startsWith("state:")) {
+        if (msg.startsWith("state:")) {
             String state = msg.replace("state:", "");
             try {
                 SupportState supportState = SupportState.getSupportState(state);
