@@ -1,6 +1,5 @@
 package de.gamechest.backend.socket.support;
 
-import de.gamechest.backend.Backend;
 import de.gamechest.backend.socket.SupportState;
 import de.gamechest.backend.socket.SupportTab;
 import de.gamechest.backend.socket.support.minecraft.AnswersTable;
@@ -41,7 +40,7 @@ public class SupportDatabase extends SqlLiteDatabase {
         String mcCmd = this.minecraftTable.insert(ticketId, topic, version, serverId, subject, msg);
         String mcAnswersCmd = this.answersTable.insert(ticketId, "system", "created");
 
-        if (this.executeUpdate(ticketsCmd) && this.executeUpdate(mcCmd)) {
+        if(this.executeUpdate(ticketsCmd) && this.executeUpdate(mcCmd)) {
             return this.executeUpdate(mcAnswersCmd);
         }
         return false;
@@ -99,47 +98,25 @@ public class SupportDatabase extends SqlLiteDatabase {
                     case DEFAULT:
                         break;
                     case MINECRAFT:
-                        String[] keys = {"topic", "version", "server_id", "subject", "message"};
-                        String[] keysAnswers = {"answer", "user", "message", "timestamp"};
+                        String[] keys = { "topic", "version", "server_id", "subject", "message" };
+                        String[] keysAnswers = { "answer", "user", "message", "timestamp" };
 
-                        Backend.getInstance().runAsync(() -> {
-                            ResultSet mcResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
-                            try {
-                                while (mcResultSet.next()) {
-                                    for (String key : keys) {
-                                        document.append(key, mcResultSet.getString(key));
-                                    }
-                                }
-                            } catch (SQLException ex) {
-                                ex.printStackTrace();
-                            } finally {
-                                try {
-                                    mcResultSet.close();
-                                } catch (SQLException e) {
-                                    e.printStackTrace();
-                                }
+                        ResultSet mcResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
+                        while (mcResultSet.next()) {
+                            for (String key : keys) {
+                                document.append(key, mcResultSet.getString(key));
                             }
-                        });
-                        Backend.getInstance().runAsync(() -> {
-                            ResultSet answerResultSet = this.executeQuery(this.answersTable.select(ticketId));
-                            try {
-                                while (answerResultSet.next()) {
-                                    Document answer = new Document();
-                                    for (String key : keysAnswers) {
-                                        answer.append(key, answerResultSet.getString(key));
-                                    }
-                                    answers.add(answer);
-                                }
-                            } catch (SQLException ex) {
-                                ex.printStackTrace();
-                            } finally {
-                                try {
-                                    answerResultSet.close();
-                                } catch (SQLException e) {
-                                    e.printStackTrace();
-                                }
+                        }
+                        mcResultSet.close();
+                        ResultSet answerResultSet = this.executeQuery(this.answersTable.select(ticketId));
+                        while (answerResultSet.next()) {
+                            Document answer = new Document();
+                            for (String key : keysAnswers) {
+                                answer.append(key, answerResultSet.getString(key));
                             }
-                        });
+                            answers.add(answer);
+                        }
+                        answerResultSet.close();
                         break;
                     case WEBSITE:
                         break;
@@ -151,7 +128,6 @@ public class SupportDatabase extends SqlLiteDatabase {
                         break;
                 }
                 document.append("answers", answers);
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -163,14 +139,14 @@ public class SupportDatabase extends SqlLiteDatabase {
             }
         }
 
-        if (!document.containsKey("id")) {
+        if(!document.containsKey("id")) {
             document.append("id", "-2");
         }
         return document;
     }
 
     public boolean answer(int ticketId, String user, String msg) {
-        if (msg.startsWith("state:")) {
+        if(msg.startsWith("state:")) {
             String state = msg.replace("state:", "");
             try {
                 SupportState supportState = SupportState.getSupportState(state);
