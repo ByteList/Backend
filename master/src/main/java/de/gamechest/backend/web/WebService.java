@@ -72,12 +72,18 @@ public class WebService {
                 long currentSeconds = System.currentTimeMillis() / 1000;
 
                 new HashMap<>(collectionCache).forEach((id, cachedCollection) -> {
-                    long timestamp = cachedCollection.getTimestamp() + 10;
+                    long timestamp = cachedCollection.getTimestamp() + 15;
 
                     if(timestamp > currentSeconds) {
                         collectionCache.remove(id);
                     }
                 });
+
+                try {
+                    Thread.sleep(500L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             collectionCache.clear();
         });
