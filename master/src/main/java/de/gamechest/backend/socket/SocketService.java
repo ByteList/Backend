@@ -87,7 +87,6 @@ public class SocketService {
                                                     break;
                                                 case GET_TICKET:
                                                     send = getTicket(document);
-                                                    System.out.println(send.toJson());
                                                     break;
                                             }
                                             break;

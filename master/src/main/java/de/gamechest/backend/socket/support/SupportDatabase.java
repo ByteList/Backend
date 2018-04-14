@@ -112,6 +112,32 @@ public class SupportDatabase extends SqlLiteDatabase {
         return ids;
     }
 
+    public Document getTicketInformation(int ticketId) {
+        Document document = new Document();
+        String cmd = this.ticketsTable.selectTicket(ticketId);
+        ResultSet resultSet = this.executeQuery(cmd);
+        try {
+            while (resultSet.next()) {
+                document.append("id", ticketId);
+                document.append("state", resultSet.getString("state"));
+                document.append("creator", resultSet.getString("creator"));
+                document.append("tab", resultSet.getString("tab"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(!document.containsKey("id")) {
+            document.append("id", "-2");
+        }
+        return document;
+    }
 
     public Document getTicket(int ticketId) {
         Document document = new Document();
@@ -189,6 +215,24 @@ public class SupportDatabase extends SqlLiteDatabase {
             } catch (NullPointerException ex) {
                 return false;
             }
+        }
+
+        Document info = getTicketInformation(ticketId);
+        SupportState supportState = SupportState.getSupportState(info.getString("state"));
+        String stateUpdateCmd = this.ticketsTable.updateState(ticketId, SupportState.IN_PROGRESSING.getStateString());
+        String stateUpdateAnswerCmd = this.answersTable.insert(ticketId, "system", "state:"+SupportState.IN_PROGRESSING.getStateString());
+
+        switch (supportState) {
+            case OPEN:
+                this.executeUpdate(stateUpdateCmd);
+                this.executeUpdate(stateUpdateAnswerCmd);
+                break;
+            case IN_PROGRESSING:
+                break;
+            case CLOSED:
+                this.executeUpdate(stateUpdateCmd);
+                this.executeUpdate(stateUpdateAnswerCmd);
+                break;
         }
 
         String mcAnswersCmd = this.answersTable.insert(ticketId, user, msg);
