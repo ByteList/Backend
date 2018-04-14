@@ -76,6 +76,7 @@ public class WebService {
 
                     if(timestamp > currentSeconds) {
                         findCache.remove(url);
+                        System.out.println("removed : "+ url);
                     }
                 });
 
