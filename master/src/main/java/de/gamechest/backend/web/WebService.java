@@ -10,6 +10,7 @@ import com.mongodb.client.model.Projections;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 import de.gamechest.backend.Backend;
+import de.gamechest.backend.CachedCollection;
 import de.gamechest.backend.database.DatabaseCollection;
 import de.gamechest.backend.database.DatabaseManager;
 import de.gamechest.backend.log.BackendLogger;
@@ -23,10 +24,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static de.gamechest.backend.database.settings.DatabaseSettingsObject.*;
 
@@ -58,6 +56,7 @@ public class WebService {
     private final String METHOD_OPTIONS = "OPTIONS";
     private final String ALLOWED_METHODS = METHOD_GET + "," + METHOD_OPTIONS;
 
+    private final HashMap<Integer, CachedCollection<Document>> collectionCache = new HashMap<>();
 
     public WebService(BackendLogger logger, int port, boolean local) {
         this.logger = logger;
@@ -67,6 +66,22 @@ public class WebService {
 
     public void startWebServer(Backend backend) {
         logger.info("Starting Web-Server...");
+
+        backend.runAsync(()-> {
+            while (backend.isRunning) {
+                long currentSeconds = System.currentTimeMillis() / 1000;
+
+                new HashMap<>(collectionCache).forEach((id, cachedCollection) -> {
+                    long timestamp = cachedCollection.getTimestamp() + 10;
+
+                    if(timestamp > currentSeconds) {
+                        collectionCache.remove(id);
+                    }
+                });
+            }
+            collectionCache.clear();
+        });
+
         final DatabaseManager databaseManager = backend.getDatabaseManager();
 
         try {
@@ -84,8 +99,6 @@ public class WebService {
 
                             final Map<String, List<String>> requestParameters = getRequestParameters(httpExchange.getRequestURI());
 
-                            logger.info("[W "+httpExchange.getRemoteAddress().toString()+"] "+httpExchange.getRequestURI().toString());
-
                             if (requestParameters.containsKey("uid")) {
                                 String uid = requestParameters.get("uid").get(0);
                                 if (uid.equals(backend.getBackendUid())) {
@@ -101,13 +114,21 @@ public class WebService {
 
                                         try {
                                             int id = Integer.parseInt(dbId);
-                                            if(id > 999) {
-                                                dbName = DatabaseCollection.getDatabaseCollectionFromId(id).getName();
-                                                collection = databaseManager.getCollection(DatabaseCollection.getDatabaseCollectionFromId(id));
+
+                                            if(collectionCache.containsKey(id)) {
+                                                collection = collectionCache.get(id).getCollection();
+                                                logger.info("[W "+httpExchange.getRemoteAddress().toString()+" | cached] "+httpExchange.getRequestURI().toString());
                                             } else {
-                                                dbName = de.gamechest.database.DatabaseCollection.getDatabaseCollectionFromId(id).getName();
-                                                collection = databaseManager.getParentDatabaseManager()
-                                                        .getCollection(de.gamechest.database.DatabaseCollection.getDatabaseCollectionFromId(id));
+                                                if(id > 999) {
+                                                    dbName = DatabaseCollection.getDatabaseCollectionFromId(id).getName();
+                                                    collection = databaseManager.getCollection(DatabaseCollection.getDatabaseCollectionFromId(id));
+                                                } else {
+                                                    dbName = de.gamechest.database.DatabaseCollection.getDatabaseCollectionFromId(id).getName();
+                                                    collection = databaseManager.getParentDatabaseManager()
+                                                            .getCollection(de.gamechest.database.DatabaseCollection.getDatabaseCollectionFromId(id));
+                                                }
+                                                collectionCache.put(id, new CachedCollection<>(System.currentTimeMillis() / 1000, collection));
+                                                logger.info("[W "+httpExchange.getRemoteAddress().toString()+"] "+httpExchange.getRequestURI().toString());
                                             }
 
                                             String[] filter = null;
