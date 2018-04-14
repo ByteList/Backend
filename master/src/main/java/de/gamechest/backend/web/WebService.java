@@ -10,7 +10,7 @@ import com.mongodb.client.model.Projections;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 import de.gamechest.backend.Backend;
-import de.gamechest.backend.CachedCollection;
+import de.gamechest.backend.Cached;
 import de.gamechest.backend.database.DatabaseCollection;
 import de.gamechest.backend.database.DatabaseManager;
 import de.gamechest.backend.log.BackendLogger;
@@ -56,7 +56,7 @@ public class WebService {
     private final String METHOD_OPTIONS = "OPTIONS";
     private final String ALLOWED_METHODS = METHOD_GET + "," + METHOD_OPTIONS;
 
-    private final HashMap<Integer, CachedCollection<Document>> collectionCache = new HashMap<>();
+    private final HashMap<String, Cached<FindIterable<Document>>> findCache = new HashMap<>();
 
     public WebService(BackendLogger logger, int port, boolean local) {
         this.logger = logger;
@@ -71,11 +71,11 @@ public class WebService {
             while (backend.isRunning) {
                 long currentSeconds = System.currentTimeMillis() / 1000;
 
-                new HashMap<>(collectionCache).forEach((id, cachedCollection) -> {
-                    long timestamp = cachedCollection.getTimestamp() + 15;
+                new HashMap<>(findCache).forEach((url, cached) -> {
+                    long timestamp = cached.getTimestamp() + 15;
 
                     if(timestamp > currentSeconds) {
-                        collectionCache.remove(id);
+                        findCache.remove(url);
                     }
                 });
 
@@ -85,7 +85,7 @@ public class WebService {
                     e.printStackTrace();
                 }
             }
-            collectionCache.clear();
+            findCache.clear();
         });
 
         final DatabaseManager databaseManager = backend.getDatabaseManager();
@@ -120,11 +120,14 @@ public class WebService {
 
                                         try {
                                             int id = Integer.parseInt(dbId);
+                                            String url = httpExchange.getRequestURI().toString();
 
-                                            if(collectionCache.containsKey(id)) {
-                                                collection = collectionCache.get(id).getCollection();
+                                            if(findCache.containsKey(url)) {
+                                                find = findCache.get(url).getCached();
                                                 logger.info("[W "+httpExchange.getRemoteAddress().toString()+" | cached] "+httpExchange.getRequestURI().toString());
                                             } else {
+                                                logger.info("[W "+httpExchange.getRemoteAddress().toString()+"] "+httpExchange.getRequestURI().toString());
+
                                                 if(id > 999) {
                                                     dbName = DatabaseCollection.getDatabaseCollectionFromId(id).getName();
                                                     collection = databaseManager.getCollection(DatabaseCollection.getDatabaseCollectionFromId(id));
@@ -133,47 +136,45 @@ public class WebService {
                                                     collection = databaseManager.getParentDatabaseManager()
                                                             .getCollection(de.gamechest.database.DatabaseCollection.getDatabaseCollectionFromId(id));
                                                 }
-                                                collectionCache.put(id, new CachedCollection<>(System.currentTimeMillis() / 1000, collection));
-                                                logger.info("[W "+httpExchange.getRemoteAddress().toString()+"] "+httpExchange.getRequestURI().toString());
-                                            }
-
-                                            String[] filter = null;
-                                            if(requestParameters.containsKey("filter")) {
-                                                filter = requestParameters.get("filter").get(0).split(":");
-                                                Bson f = Filters.eq(filter[0], filter[1]);
-                                                find = collection.find(f);
-                                            } else {
-                                                find = collection.find();
-                                            }
-
-                                            if(requestParameters.containsKey("accesses")) {
-                                                String[] accesses = requestParameters.get("accesses").get(0).split(":");
-
-                                                find.cursorType(CursorType.NonTailable);
-                                                find.projection(Projections.include(accesses));
-                                            }
-
-                                            if(requestParameters.containsKey("coding")) {
-                                                String coding = requestParameters.get("coding").get(0);
-
-                                                jsonCoding = JsonCoding.getJsonCodingFromId(Integer.parseInt(coding));
-                                            }
-
-                                            if(requestParameters.containsKey("set")) {
-                                                String[] args = requestParameters.get("set").get(0).split("~;~");
-                                                for(String arg : args) {
-                                                    String setter = arg.split("§:§")[0];
-                                                    String value = arg.split("§:§")[1];
-
-                                                    BasicDBObject uDoc = new BasicDBObject();
-                                                    uDoc.append("$set", new BasicDBObject().append(setter, value));
-
-                                                    BasicDBObject basicDBObject = new BasicDBObject();
-                                                    if(filter != null) {
-                                                        basicDBObject = new BasicDBObject(filter[0], filter[1]);
-                                                    }
-                                                    collection.updateOne(basicDBObject, uDoc);
+                                                String[] filter = null;
+                                                if(requestParameters.containsKey("filter")) {
+                                                    filter = requestParameters.get("filter").get(0).split(":");
+                                                    Bson f = Filters.eq(filter[0], filter[1]);
+                                                    find = collection.find(f);
+                                                } else {
+                                                    find = collection.find();
                                                 }
+
+                                                if(requestParameters.containsKey("accesses")) {
+                                                    String[] accesses = requestParameters.get("accesses").get(0).split(":");
+
+                                                    find.cursorType(CursorType.NonTailable);
+                                                    find.projection(Projections.include(accesses));
+                                                }
+
+                                                if(requestParameters.containsKey("coding")) {
+                                                    String coding = requestParameters.get("coding").get(0);
+
+                                                    jsonCoding = JsonCoding.getJsonCodingFromId(Integer.parseInt(coding));
+                                                }
+
+                                                if(requestParameters.containsKey("set")) {
+                                                    String[] args = requestParameters.get("set").get(0).split("~;~");
+                                                    for(String arg : args) {
+                                                        String setter = arg.split("§:§")[0];
+                                                        String value = arg.split("§:§")[1];
+
+                                                        BasicDBObject uDoc = new BasicDBObject();
+                                                        uDoc.append("$set", new BasicDBObject().append(setter, value));
+
+                                                        BasicDBObject basicDBObject = new BasicDBObject();
+                                                        if(filter != null) {
+                                                            basicDBObject = new BasicDBObject(filter[0], filter[1]);
+                                                        }
+                                                        collection.updateOne(basicDBObject, uDoc);
+                                                    }
+                                                }
+                                                findCache.put(url, new Cached<>(find));
                                             }
 
                                             Document doc = new Document();

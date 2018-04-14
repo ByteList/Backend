@@ -1,7 +1,5 @@
 package de.gamechest.backend;
 
-import com.mongodb.client.MongoCollection;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -9,10 +7,14 @@ import lombok.Getter;
  * <p>
  * Copyright by ByteList - https://bytelist.de/
  */
-@AllArgsConstructor
-public class CachedCollection<T> {
+public class Cached<T> {
     @Getter
     private long timestamp;
     @Getter
-    private MongoCollection<T> collection;
+    private T cached;
+
+    public Cached(T value) {
+        this.timestamp = System.currentTimeMillis();
+        this.cached = value;
+    }
 }
