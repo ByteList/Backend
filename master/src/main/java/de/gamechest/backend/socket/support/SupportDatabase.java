@@ -215,24 +215,24 @@ public class SupportDatabase extends SqlLiteDatabase {
             } catch (NullPointerException ex) {
                 return false;
             }
-        }
+        } else {
+            Document info = getTicketInformation(ticketId);
+            SupportState supportState = SupportState.getSupportState(info.getString("state"));
+            String stateUpdateCmd = this.ticketsTable.updateState(ticketId, SupportState.IN_PROGRESSING.getStateString());
+            String stateUpdateAnswerCmd = this.answersTable.insert(ticketId, "system", "state:"+SupportState.IN_PROGRESSING.getStateString());
 
-        Document info = getTicketInformation(ticketId);
-        SupportState supportState = SupportState.getSupportState(info.getString("state"));
-        String stateUpdateCmd = this.ticketsTable.updateState(ticketId, SupportState.IN_PROGRESSING.getStateString());
-        String stateUpdateAnswerCmd = this.answersTable.insert(ticketId, "system", "state:"+SupportState.IN_PROGRESSING.getStateString());
-
-        switch (supportState) {
-            case OPEN:
-                this.executeUpdate(stateUpdateCmd);
-                this.executeUpdate(stateUpdateAnswerCmd);
-                break;
-            case IN_PROGRESSING:
-                break;
-            case CLOSED:
-                this.executeUpdate(stateUpdateCmd);
-                this.executeUpdate(stateUpdateAnswerCmd);
-                break;
+            switch (supportState) {
+                case OPEN:
+                    this.executeUpdate(stateUpdateCmd);
+                    this.executeUpdate(stateUpdateAnswerCmd);
+                    break;
+                case IN_PROGRESSING:
+                    break;
+                case CLOSED:
+                    this.executeUpdate(stateUpdateCmd);
+                    this.executeUpdate(stateUpdateAnswerCmd);
+                    break;
+            }
         }
 
         String mcAnswersCmd = this.answersTable.insert(ticketId, user, msg);
