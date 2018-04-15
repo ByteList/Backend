@@ -80,7 +80,7 @@ public class MailClient {
             MimeMessage message = new MimeMessage(session);
 
             message.setFrom(new InternetAddress(fromAddress, "GameChest"));
-            message.setSender(new InternetAddress(fromAddress, "GameChest"));
+            message.setSender(new InternetAddress("bytelist.de"));
             message.setSentDate(new Date());
 
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
