@@ -9,7 +9,7 @@ public class HtmlUtf8Characters {
 
     private static final String[] converts = {
             "äa:&#uml;", "ÄA:&#uml;", "öo:&#uml;", "ÖO:&#uml;", "üu:&#uml;", "ÜU:&#uml;",
-            "ß:&szlig;", "€:&euro;", "&:&amp;", "©:&copy;", "•:&bull;", "™:&trade;", "§:&sect;"
+            "ß:&szlig;", "€:&euro;", "©:&copy;", "•:&bull;", "™:&trade;", "§:&sect;"
     };
 
     public static String convertToHtmlCharacters(String str) {
