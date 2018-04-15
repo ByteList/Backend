@@ -6,7 +6,9 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -59,6 +61,8 @@ public class MailClient {
             MimeMessage message = new MimeMessage(session);
 
             message.setFrom(new InternetAddress(fromAddress));
+            message.setSender(new InternetAddress(fromAddress));
+
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
 
             message.setSubject(subject);
@@ -75,7 +79,10 @@ public class MailClient {
         try {
             MimeMessage message = new MimeMessage(session);
 
-            message.setFrom(new InternetAddress(fromAddress));
+            message.setFrom(new InternetAddress(fromAddress, "GameChest"));
+            message.setSender(new InternetAddress(fromAddress, "GameChest"));
+            message.setSentDate(new Date());
+
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
 
             message.setSubject(subject);
@@ -84,7 +91,7 @@ public class MailClient {
             Transport.send(message);
             System.out.println("[Mail] Sent mail to "+toAddress+": "+subject);
             return true;
-        } catch (MessagingException ex) {
+        } catch (MessagingException | UnsupportedEncodingException ex) {
             ex.printStackTrace();
         }
         return false;
