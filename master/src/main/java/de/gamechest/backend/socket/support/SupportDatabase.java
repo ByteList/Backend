@@ -112,16 +112,57 @@ public class SupportDatabase extends SqlLiteDatabase {
             while (resultSet.next()) {
                 Document document = new Document();
                 int id = resultSet.getInt("ticket_id");
-                document.append("id", id);
-                document.append("state", resultSet.getString("state"));
-                document.append("tab", resultSet.getString("tab"));
+                String tab = resultSet.getString("tab");
 
-                ResultSet tResultSet = this.executeQuery(this.minecraftTable.select(id));
-                while (tResultSet.next()) {
-                    document.append("subject", tResultSet.getString("subject"));
-                    document.append("topic", tResultSet.getString("topic"));
+                document.append("id", id);
+                document.append("tab", tab);
+                document.append("state", resultSet.getString("state"));
+
+                switch (SupportTab.getSupportTab(tab)) {
+
+                    case DEFAULT:
+                        break;
+                    case MINECRAFT:
+                        ResultSet mcResultSet = this.executeQuery(this.minecraftTable.select(id));
+                        while (mcResultSet.next()) {
+                            document.append("subject", mcResultSet.getString("subject"));
+                            document.append("topic", mcResultSet.getString("topic"));
+                        }
+                        mcResultSet.close();
+                        break;
+                    case WEBSITE:
+                        ResultSet webResultSet = this.executeQuery(this.websiteTable.select(id));
+                        while (webResultSet.next()) {
+                            document.append("subject", webResultSet.getString("subject"));
+                            document.append("topic", webResultSet.getString("topic"));
+                        }
+                        webResultSet.close();
+                        break;
+                    case TEAMSPEAK:
+                        ResultSet tsResultSet = this.executeQuery(this.teamspeakTable.select(id));
+                        while (tsResultSet.next()) {
+                            document.append("subject", tsResultSet.getString("subject"));
+                            document.append("topic", tsResultSet.getString("topic"));
+                        }
+                        tsResultSet.close();
+                        break;
+                    case DISCORD:
+                        ResultSet disResultSet = this.executeQuery(this.discordTable.select(id));
+                        while (disResultSet.next()) {
+                            document.append("subject", disResultSet.getString("subject"));
+                            document.append("topic", disResultSet.getString("topic"));
+                        }
+                        disResultSet.close();
+                        break;
+                    case ANYTHING:
+                        ResultSet anyResultSet = this.executeQuery(this.anythingTable.select(id));
+                        while (anyResultSet.next()) {
+                            document.append("subject", anyResultSet.getString("subject"));
+                            document.append("topic", anyResultSet.getString("topic"));
+                        }
+                        anyResultSet.close();
+                        break;
                 }
-                tResultSet.close();
                 ids.add(document);
             }
         } catch (SQLException e) {
@@ -169,7 +210,7 @@ public class SupportDatabase extends SqlLiteDatabase {
         return ids;
     }
 
-    public Document getTicketInformation(int ticketId) {
+    private Document getTicketInformation(int ticketId) {
         Document document = new Document();
         String cmd = this.ticketsTable.selectTicket(ticketId);
         ResultSet resultSet = this.executeQuery(cmd);
