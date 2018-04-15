@@ -10,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import static de.gamechest.backend.util.HtmlUtf8Characters.convertToHtmlCharacters;
+
 /**
  * Created by ByteList on 08.04.2018.
  * <p>
@@ -125,7 +127,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                     case MINECRAFT:
                         ResultSet mcResultSet = this.executeQuery(this.minecraftTable.select(id));
                         while (mcResultSet.next()) {
-                            document.append("subject", mcResultSet.getString("subject"));
+                            document.append("subject", convertToHtmlCharacters(mcResultSet.getString("subject")));
                             document.append("topic", mcResultSet.getString("topic"));
                         }
                         mcResultSet.close();
@@ -133,7 +135,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                     case WEBSITE:
                         ResultSet webResultSet = this.executeQuery(this.websiteTable.select(id));
                         while (webResultSet.next()) {
-                            document.append("subject", webResultSet.getString("subject"));
+                            document.append("subject", convertToHtmlCharacters(webResultSet.getString("subject")));
                             document.append("topic", webResultSet.getString("topic"));
                         }
                         webResultSet.close();
@@ -141,7 +143,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                     case TEAMSPEAK:
                         ResultSet tsResultSet = this.executeQuery(this.teamspeakTable.select(id));
                         while (tsResultSet.next()) {
-                            document.append("subject", tsResultSet.getString("subject"));
+                            document.append("subject", convertToHtmlCharacters(tsResultSet.getString("subject")));
                             document.append("topic", tsResultSet.getString("topic"));
                         }
                         tsResultSet.close();
@@ -149,7 +151,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                     case DISCORD:
                         ResultSet disResultSet = this.executeQuery(this.discordTable.select(id));
                         while (disResultSet.next()) {
-                            document.append("subject", disResultSet.getString("subject"));
+                            document.append("subject", convertToHtmlCharacters(disResultSet.getString("subject")));
                             document.append("topic", disResultSet.getString("topic"));
                         }
                         disResultSet.close();
@@ -157,8 +159,8 @@ public class SupportDatabase extends SqlLiteDatabase {
                     case ANYTHING:
                         ResultSet anyResultSet = this.executeQuery(this.anythingTable.select(id));
                         while (anyResultSet.next()) {
-                            document.append("subject", anyResultSet.getString("subject"));
-                            document.append("topic", anyResultSet.getString("topic"));
+                            document.append("subject", convertToHtmlCharacters(anyResultSet.getString("subject")));
+                            document.append("topic", convertToHtmlCharacters(anyResultSet.getString("topic")));
                         }
                         anyResultSet.close();
                         break;
@@ -192,8 +194,8 @@ public class SupportDatabase extends SqlLiteDatabase {
 
                 ResultSet tResultSet = this.executeQuery(this.minecraftTable.select(id));
                 while (tResultSet.next()) {
-                    document.append("subject", tResultSet.getString("subject"));
-                    document.append("topic", tResultSet.getString("topic"));
+                    document.append("subject", convertToHtmlCharacters(tResultSet.getString("subject")));
+                    document.append("topic", convertToHtmlCharacters(tResultSet.getString("topic")));
                 }
                 tResultSet.close();
                 ids.add(document);
@@ -259,7 +261,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                         ResultSet mcResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
                         while (mcResultSet.next()) {
                             for (String key : mcKeys) {
-                                document.append(key, mcResultSet.getString(key));
+                                document.append(key, convertToHtmlCharacters(mcResultSet.getString(key)));
                             }
                         }
                         mcResultSet.close();
@@ -268,7 +270,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                         ResultSet webResultSet = this.executeQuery(this.websiteTable.select(ticketId));
                         while (webResultSet.next()) {
                             for (String key : webKeys) {
-                                document.append(key, webResultSet.getString(key));
+                                document.append(key, convertToHtmlCharacters(webResultSet.getString(key)));
                             }
                         }
                         webResultSet.close();
@@ -277,7 +279,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                         ResultSet tsResultSet = this.executeQuery(this.teamspeakTable.select(ticketId));
                         while (tsResultSet.next()) {
                             for (String key : tsKeys) {
-                                document.append(key, tsResultSet.getString(key));
+                                document.append(key, convertToHtmlCharacters(tsResultSet.getString(key)));
                             }
                         }
                         tsResultSet.close();
@@ -286,7 +288,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                         ResultSet disResultSet = this.executeQuery(this.discordTable.select(ticketId));
                         while (disResultSet.next()) {
                             for (String key : disKeys) {
-                                document.append(key, disResultSet.getString(key));
+                                document.append(key, convertToHtmlCharacters(disResultSet.getString(key)));
                             }
                         }
                         disResultSet.close();
@@ -295,7 +297,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                         ResultSet anyResultSet = this.executeQuery(this.anythingTable.select(ticketId));
                         while (anyResultSet.next()) {
                             for (String key : anyKeys) {
-                                document.append(key, anyResultSet.getString(key));
+                                document.append(key, convertToHtmlCharacters(anyResultSet.getString(key)));
                             }
                         }
                         anyResultSet.close();
@@ -306,7 +308,7 @@ public class SupportDatabase extends SqlLiteDatabase {
                 while (answerResultSet.next()) {
                     Document answer = new Document();
                     for (String key : keysAnswers) {
-                        answer.append(key, answerResultSet.getString(key));
+                        answer.append(key, convertToHtmlCharacters(answerResultSet.getString(key)));
                     }
                     answers.add(answer);
                 }
