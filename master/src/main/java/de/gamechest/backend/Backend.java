@@ -45,7 +45,7 @@ public class Backend {
     @Getter
     private BackendLogger logger;
     @Getter
-    private String version = "unknown";
+    private String version;
     /**
      * The DatabaseManager is used to manage all database things.
      * Here you can find all mongodb data's.
@@ -145,6 +145,7 @@ public class Backend {
         startStopThread();
         this.webService.startWebServer(this);
         this.socketService.startSocketServer(this);
+        startRegisterThread();
     }
 
     public void stop() {
@@ -177,7 +178,7 @@ public class Backend {
         System.exit( 0 );
     }
 
-    public void startStopThread() {
+    private void startStopThread() {
         if(stopDate.equals("false")) {
             this.logger.info("Auto-Stop is disabled.");
             return;
@@ -209,6 +210,11 @@ public class Backend {
                 }
             }
         }.start();
+    }
+
+    private void startRegisterThread() {
+        Thread thread = new Thread(new RegisterRunnable(this), "Register Thread");
+        thread.start();
     }
 
     public void startSetUp(File backendFile) {

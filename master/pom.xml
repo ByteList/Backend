@@ -41,6 +41,7 @@
             <version>2.8.2</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>de.gamechest</groupId>
             <artifactId>database</artifactId>

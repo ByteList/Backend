@@ -43,14 +43,15 @@ public class MailClient {
         }
     }
 
-    public void sendRegisterMail(String user, String verifyCode) {
+    public boolean sendRegisterMail(String mail, String user, String verifyCode) {
         try {
             String content = Resources.toString(Resources.getResource("mails/register.html"), Charset.forName("UTF-8"))
                     .replace("#{user.name}", user).replace("#{user.verifyUrl}", "https://game-chest.de/register/"+verifyCode+"/");
-            sendHtmlMail("Registrierung auf game-chest.de", content, "mail@bytelist.de");
+            return sendHtmlMail("Registrierung auf game-chest.de", content, mail);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public void sendMail(String subject, String text, String toAddress) {
@@ -70,7 +71,7 @@ public class MailClient {
         }
     }
 
-    public void sendHtmlMail(String subject, Object content, String toAddress) {
+    private boolean sendHtmlMail(String subject, Object content, String toAddress) {
         try {
             MimeMessage message = new MimeMessage(session);
 
@@ -82,8 +83,10 @@ public class MailClient {
 
             Transport.send(message);
             System.out.println("[Mail] Sent mail to "+toAddress+": "+subject);
+            return true;
         } catch (MessagingException ex) {
             ex.printStackTrace();
         }
+        return false;
     }
 }
