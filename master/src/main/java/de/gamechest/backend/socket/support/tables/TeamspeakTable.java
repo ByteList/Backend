@@ -1,20 +1,20 @@
-package de.gamechest.backend.socket.support.minecraft;
+package de.gamechest.backend.socket.support.tables;
 
+import de.gamechest.backend.socket.support.SupportTab;
+import de.gamechest.backend.socket.support.SupportDatabase;
 import de.gamechest.backend.sql.SqlLiteTable;
 import de.gamechest.backend.sql.SqlLiteTableStructure;
-import de.gamechest.backend.socket.SupportTab;
-import de.gamechest.backend.socket.support.SupportDatabase;
 import lombok.Getter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Created by ByteList on 08.04.2018.
+ * Created by ByteList on 15.04.2018.
  * <p>
  * Copyright by ByteList - https://bytelist.de/
  */
-public class MinecraftTable implements SqlLiteTable {
+public class TeamspeakTable implements SqlLiteTable {
 
     private final SupportDatabase database;
 
@@ -25,21 +25,21 @@ public class MinecraftTable implements SqlLiteTable {
     @Getter
     private SqlLiteTableStructure structure;
 
-    public MinecraftTable(SupportDatabase database) {
+    public TeamspeakTable(SupportDatabase database) {
         this.database = database;
 
-        this.supportTab = SupportTab.MINECRAFT;
+        this.supportTab = SupportTab.TEAMSPEAK;
         this.name = this.supportTab.getTabShort();
 
         this.structure = new SqlLiteTableStructure()
                 .append("ticket_id")
                 .append("topic")
-                .append("version")
-                .append("server_id")
+                .append("name")
+                .append("uid")
                 .append("subject")
                 .append("message").create();
 
-        database.executeUpdate("CREATE TABLE IF NOT EXISTS "+name+" "+structure.toStatementFormattedString());
+        database.executeUpdate("CREATE TABLE IF NOT EXISTS "+this.name+" "+this.structure.toStatementFormattedString());
     }
 
     @Override
@@ -62,13 +62,13 @@ public class MinecraftTable implements SqlLiteTable {
         return count;
     }
 
-    public String insert(int ticketId, String topic, String version, String serverId, String subject, String msg) {
+    public String insert(int ticketId, String topic, String name, String uid, String subject, String msg) {
         String structure = this.structure.toValuesFormattedString();
         structure = structure
                 .replace("ticket_id", String.valueOf(ticketId))
                 .replace("topic", topic)
-                .replace("version", version)
-                .replace("server_id", serverId)
+                .replace("name", name)
+                .replace("uid", uid)
                 .replace("subject", subject)
                 .replace("message", msg);
 

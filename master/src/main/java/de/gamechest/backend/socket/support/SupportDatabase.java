@@ -1,9 +1,6 @@
 package de.gamechest.backend.socket.support;
 
-import de.gamechest.backend.socket.SupportState;
-import de.gamechest.backend.socket.SupportTab;
-import de.gamechest.backend.socket.support.minecraft.AnswersTable;
-import de.gamechest.backend.socket.support.minecraft.MinecraftTable;
+import de.gamechest.backend.socket.support.tables.*;
 import de.gamechest.backend.sql.SqlLiteDatabase;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,25 +20,85 @@ import java.util.ArrayList;
 public class SupportDatabase extends SqlLiteDatabase {
 
     private final TicketsTable ticketsTable;
-    private final MinecraftTable minecraftTable;
     private final AnswersTable answersTable;
 
+    private final MinecraftTable minecraftTable;
+    private final WebsiteTable websiteTable;
+    private final TeamspeakTable teamspeakTable;
+    private final DiscordTable discordTable;
+    private final AnythingTable anythingTable;
+
+    private final String[] keysAnswers = { "answer", "user", "message", "timestamp" };
+
+    private final String[] mcKeys = { "topic", "version", "server_id", "subject", "message" };
+    private final String[] webKeys = { "topic", "url", "subject", "message" };
+    private final String[] tsKeys = { "topic", "name", "uid", "subject", "message" };
+    private final String[] disKeys = { "topic", "name", "channel", "subject", "message" };
+    private final String[] anyKeys = { "topic", "subject", "message" };
 
     public SupportDatabase() {
         super("support");
         this.addNewTable(this.ticketsTable = new TicketsTable(this));
+        this.addNewTable(this.answersTable = new AnswersTable(this));
 
         this.addNewTable(this.minecraftTable = new MinecraftTable(this));
-        this.addNewTable(this.answersTable = new AnswersTable(this));
+        this.addNewTable(this.websiteTable = new WebsiteTable(this));
+        this.addNewTable(this.teamspeakTable = new TeamspeakTable(this));
+        this.addNewTable(this.discordTable = new DiscordTable(this));
+        this.addNewTable(this.anythingTable = new AnythingTable(this));
     }
 
     public boolean createMinecraftTicket(int ticketId, String creator, String topic, String version, String serverId, String subject, String msg) {
         String ticketsCmd = this.ticketsTable.insert(ticketId, SupportTab.MINECRAFT.getTabShort(), creator, SupportState.OPEN.getStateString());
-        String mcCmd = this.minecraftTable.insert(ticketId, topic, version, serverId, subject, msg);
-        String mcAnswersCmd = this.answersTable.insert(ticketId, "system", "created");
+        String ticketCmd = this.minecraftTable.insert(ticketId, topic, version, serverId, subject, msg);
+        String answersCmd = this.answersTable.insert(ticketId, "system", "created");
 
-        if(this.executeUpdate(ticketsCmd) && this.executeUpdate(mcCmd)) {
-            return this.executeUpdate(mcAnswersCmd);
+        if(this.executeUpdate(ticketsCmd) && this.executeUpdate(ticketCmd)) {
+            return this.executeUpdate(answersCmd);
+        }
+        return false;
+    }
+
+    public boolean createWebsiteTicket(int ticketId, String creator, String topic, String url, String subject, String msg) {
+        String ticketsCmd = this.ticketsTable.insert(ticketId, SupportTab.WEBSITE.getTabShort(), creator, SupportState.OPEN.getStateString());
+        String ticketCmd = this.websiteTable.insert(ticketId, topic, url, subject, msg);
+        String answersCmd = this.answersTable.insert(ticketId, "system", "created");
+
+        if(this.executeUpdate(ticketsCmd) && this.executeUpdate(ticketCmd)) {
+            return this.executeUpdate(answersCmd);
+        }
+        return false;
+    }
+
+    public boolean createTeamspeakTicket(int ticketId, String creator, String topic, String name, String uid, String subject, String msg) {
+        String ticketsCmd = this.ticketsTable.insert(ticketId, SupportTab.TEAMSPEAK.getTabShort(), creator, SupportState.OPEN.getStateString());
+        String ticketCmd = this.teamspeakTable.insert(ticketId, topic, name, uid, subject, msg);
+        String answersCmd = this.answersTable.insert(ticketId, "system", "created");
+
+        if(this.executeUpdate(ticketsCmd) && this.executeUpdate(ticketCmd)) {
+            return this.executeUpdate(answersCmd);
+        }
+        return false;
+    }
+
+    public boolean createDiscordTicket(int ticketId, String creator, String topic, String name, String channel, String subject, String msg) {
+        String ticketsCmd = this.ticketsTable.insert(ticketId, SupportTab.DISCORD.getTabShort(), creator, SupportState.OPEN.getStateString());
+        String ticketCmd = this.discordTable.insert(ticketId, topic, name, channel, subject, msg);
+        String answersCmd = this.answersTable.insert(ticketId, "system", "created");
+
+        if(this.executeUpdate(ticketsCmd) && this.executeUpdate(ticketCmd)) {
+            return this.executeUpdate(answersCmd);
+        }
+        return false;
+    }
+
+    public boolean createAnythingTicket(int ticketId, String creator, String topic, String subject, String msg) {
+        String ticketsCmd = this.ticketsTable.insert(ticketId, SupportTab.ANYTHING.getTabShort(), creator, SupportState.OPEN.getStateString());
+        String ticketCmd = this.anythingTable.insert(ticketId, topic, subject, msg);
+        String answersCmd = this.answersTable.insert(ticketId, "system", "created");
+
+        if(this.executeUpdate(ticketsCmd) && this.executeUpdate(ticketCmd)) {
+            return this.executeUpdate(answersCmd);
         }
         return false;
     }
@@ -158,35 +215,61 @@ public class SupportDatabase extends SqlLiteDatabase {
                     case DEFAULT:
                         break;
                     case MINECRAFT:
-                        String[] keys = { "topic", "version", "server_id", "subject", "message" };
-                        String[] keysAnswers = { "answer", "user", "message", "timestamp" };
-
                         ResultSet mcResultSet = this.executeQuery(this.minecraftTable.select(ticketId));
                         while (mcResultSet.next()) {
-                            for (String key : keys) {
+                            for (String key : mcKeys) {
                                 document.append(key, mcResultSet.getString(key));
                             }
                         }
                         mcResultSet.close();
-                        ResultSet answerResultSet = this.executeQuery(this.answersTable.select(ticketId));
-                        while (answerResultSet.next()) {
-                            Document answer = new Document();
-                            for (String key : keysAnswers) {
-                                answer.append(key, answerResultSet.getString(key));
-                            }
-                            answers.add(answer);
-                        }
-                        answerResultSet.close();
                         break;
                     case WEBSITE:
+                        ResultSet webResultSet = this.executeQuery(this.websiteTable.select(ticketId));
+                        while (webResultSet.next()) {
+                            for (String key : webKeys) {
+                                document.append(key, webResultSet.getString(key));
+                            }
+                        }
+                        webResultSet.close();
                         break;
                     case TEAMSPEAK:
+                        ResultSet tsResultSet = this.executeQuery(this.teamspeakTable.select(ticketId));
+                        while (tsResultSet.next()) {
+                            for (String key : tsKeys) {
+                                document.append(key, tsResultSet.getString(key));
+                            }
+                        }
+                        tsResultSet.close();
                         break;
                     case DISCORD:
+                        ResultSet disResultSet = this.executeQuery(this.discordTable.select(ticketId));
+                        while (disResultSet.next()) {
+                            for (String key : disKeys) {
+                                document.append(key, disResultSet.getString(key));
+                            }
+                        }
+                        disResultSet.close();
                         break;
                     case ANYTHING:
+                        ResultSet anyResultSet = this.executeQuery(this.anythingTable.select(ticketId));
+                        while (anyResultSet.next()) {
+                            for (String key : anyKeys) {
+                                document.append(key, anyResultSet.getString(key));
+                            }
+                        }
+                        anyResultSet.close();
                         break;
                 }
+
+                ResultSet answerResultSet = this.executeQuery(this.answersTable.select(ticketId));
+                while (answerResultSet.next()) {
+                    Document answer = new Document();
+                    for (String key : keysAnswers) {
+                        answer.append(key, answerResultSet.getString(key));
+                    }
+                    answers.add(answer);
+                }
+                answerResultSet.close();
                 document.append("answers", answers);
             }
         } catch (SQLException e) {

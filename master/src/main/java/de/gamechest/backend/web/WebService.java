@@ -74,9 +74,8 @@ public class WebService {
                 new HashMap<>(findCache).forEach((url, cached) -> {
                     long timestamp = cached.getTimestamp() / 1000;
 
-                    if(currentSeconds > timestamp + 15) {
+                    if(currentSeconds > timestamp + 25) {
                         findCache.remove(url);
-                        System.out.println("removed : "+ url);
                     }
                 });
 
@@ -118,6 +117,7 @@ public class WebService {
                                         FindIterable<Document> find;
                                         MongoCollection<Document> collection;
                                         JsonCoding jsonCoding = JsonCoding.NORMAL;
+                                        boolean set = false;
 
                                         try {
                                             int id = Integer.parseInt(dbId);
@@ -174,6 +174,7 @@ public class WebService {
                                                         }
                                                         collection.updateOne(basicDBObject, uDoc);
                                                     }
+                                                    set = true;
                                                 }
 
                                                 Document doc = new Document();
@@ -208,7 +209,7 @@ public class WebService {
                                                 first = doc;
                                                 first.append("size", i[0]);
 
-                                                findCache.put(url, new Cached<>(first));
+                                                if(!set) findCache.put(url, new Cached<>(first));
                                             }
 
                                         } catch (Exception ex) {

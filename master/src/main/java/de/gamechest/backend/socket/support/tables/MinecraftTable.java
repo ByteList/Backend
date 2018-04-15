@@ -1,8 +1,10 @@
-package de.gamechest.backend.socket.support;
+package de.gamechest.backend.socket.support.tables;
 
+import de.gamechest.backend.socket.support.SupportTab;
+import de.gamechest.backend.socket.support.SupportDatabase;
 import de.gamechest.backend.sql.SqlLiteTable;
 import de.gamechest.backend.sql.SqlLiteTableStructure;
-import lombok.Data;
+import lombok.Getter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,23 +14,30 @@ import java.sql.SQLException;
  * <p>
  * Copyright by ByteList - https://bytelist.de/
  */
-@Data
-public class TicketsTable implements SqlLiteTable {
+public class MinecraftTable implements SqlLiteTable {
 
     private final SupportDatabase database;
 
+    @Getter
+    private SupportTab supportTab;
+    @Getter
     private String name;
+    @Getter
     private SqlLiteTableStructure structure;
 
-    TicketsTable(SupportDatabase database) {
+    public MinecraftTable(SupportDatabase database) {
         this.database = database;
 
-        this.name = "tickets";
+        this.supportTab = SupportTab.MINECRAFT;
+        this.name = this.supportTab.getTabShort();
+
         this.structure = new SqlLiteTableStructure()
                 .append("ticket_id")
-                .append("tab")
-                .append("creator")
-                .append("state").create();
+                .append("topic")
+                .append("version")
+                .append("server_id")
+                .append("subject")
+                .append("message").create();
 
         database.executeUpdate("CREATE TABLE IF NOT EXISTS "+name+" "+structure.toStatementFormattedString());
     }
@@ -53,34 +62,20 @@ public class TicketsTable implements SqlLiteTable {
         return count;
     }
 
-    String insert(int ticketId, String tab, String creator, String state) {
+    public String insert(int ticketId, String topic, String version, String serverId, String subject, String msg) {
         String structure = this.structure.toValuesFormattedString();
         structure = structure
                 .replace("ticket_id", String.valueOf(ticketId))
-                .replace("tab", tab)
-                .replace("creator", creator)
-                .replace("state", state);
+                .replace("topic", topic)
+                .replace("version", version)
+                .replace("server_id", serverId)
+                .replace("subject", subject)
+                .replace("message", msg);
 
         return "INSERT INTO "+this.name+" VALUES"+structure;
     }
 
-    String selectTickets(String tab, String creator) {
-        String t = "tab = '"+tab+"'";
-        String c = "creator = '"+creator+"'";
-        return "SELECT * FROM "+this.name+" WHERE "+(creator != null ? c : "")+(tab != null ? (creator != null ? " AND " : "")+t : "");
-    }
-
-    String selectTicketsFromState(String state, String creator) {
-        String s = "state = '"+state+"'";
-        String c = "creator = '"+creator+"'";
-        return "SELECT * FROM "+this.name+" WHERE "+(creator != null ? c : "")+(state != null ? (creator != null ? " AND " : "")+s : "");
-    }
-
-    String selectTicket(int ticketId) {
+    public String select(int ticketId) {
         return "SELECT * FROM "+this.name+" WHERE ticket_id = '"+ticketId+"'";
-    }
-
-    String updateState(int ticketId, String state) {
-        return "UPDATE "+this.name+" SET state = '"+state+"' WHERE ticket_id = '"+ticketId+"';";
     }
 }

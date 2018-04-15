@@ -1,8 +1,8 @@
-package de.gamechest.backend.socket.support.minecraft;
+package de.gamechest.backend.socket.support.tables;
 
+import de.gamechest.backend.socket.support.SupportDatabase;
 import de.gamechest.backend.sql.SqlLiteTable;
 import de.gamechest.backend.sql.SqlLiteTableStructure;
-import de.gamechest.backend.socket.support.SupportDatabase;
 import lombok.Data;
 
 import java.sql.ResultSet;

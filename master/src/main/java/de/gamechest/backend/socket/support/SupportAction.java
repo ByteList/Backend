@@ -1,4 +1,4 @@
-package de.gamechest.backend.socket;
+package de.gamechest.backend.socket.support;
 
 import lombok.Getter;
 
@@ -10,7 +10,6 @@ import lombok.Getter;
 public enum SupportAction {
 
     CREATE(0),
-    CHANGE_STATE(1),
     ANSWER(2),
     GET_TICKETS(3),
     GET_TICKET(4);

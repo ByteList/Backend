@@ -2,8 +2,9 @@ package de.gamechest.backend.socket;
 
 import de.gamechest.backend.Backend;
 import de.gamechest.backend.log.BackendLogger;
+import de.gamechest.backend.socket.support.SupportAction;
 import de.gamechest.backend.socket.support.SupportDatabase;
-import de.gamechest.backend.socket.support.minecraft.MinecraftTable;
+import de.gamechest.backend.socket.support.SupportTab;
 import org.bson.Document;
 
 import java.io.*;
@@ -26,14 +27,12 @@ public class SocketService {
     private final boolean local;
 
     private SupportDatabase database;
-    private MinecraftTable minecraftTable;
 
     public SocketService(BackendLogger logger, int port, boolean local) {
         this.logger = logger;
         this.port = port;
         this.local = local;
         this.database = new SupportDatabase();
-        this.minecraftTable = this.database.getMinecraftTable();
     }
 
     public void startSocketServer(Backend backend) {
@@ -72,9 +71,6 @@ public class SocketService {
                                                 case CREATE:
                                                     send.append("error", "wrong action");
                                                     break;
-                                                case CHANGE_STATE:
-                                                    send.append("error", "wrong action");
-                                                    break;
                                                 case ANSWER:
                                                     send = answer(document, send);
                                                     break;
@@ -95,11 +91,8 @@ public class SocketService {
                                                 case CREATE:
                                                     send = createMC(document, send);
                                                     break;
-                                                case CHANGE_STATE:
-                                                    send = changeStateMC(document, send);
-                                                    break;
                                                 case ANSWER:
-                                                    send.append("error", "wrong action");
+                                                    send = answer(document, send);
                                                     break;
                                                 case GET_TICKETS:
                                                     send.append("error", "wrong action");
@@ -110,12 +103,68 @@ public class SocketService {
                                             }
                                             break;
                                         case WEBSITE:
+                                            switch (supportAction) {
+                                                case CREATE:
+                                                    send = createWeb(document, send);
+                                                    break;
+                                                case ANSWER:
+                                                    send = answer(document, send);
+                                                    break;
+                                                case GET_TICKETS:
+                                                    send.append("error", "wrong action");
+                                                    break;
+                                                case GET_TICKET:
+                                                    send = getTicket(document);
+                                                    break;
+                                            }
                                             break;
                                         case TEAMSPEAK:
+                                            switch (supportAction) {
+                                                case CREATE:
+                                                    send = createTs(document, send);
+                                                    break;
+                                                case ANSWER:
+                                                    send = answer(document, send);
+                                                    break;
+                                                case GET_TICKETS:
+                                                    send.append("error", "wrong action");
+                                                    break;
+                                                case GET_TICKET:
+                                                    send = getTicket(document);
+                                                    break;
+                                            }
                                             break;
                                         case DISCORD:
+                                            switch (supportAction) {
+                                                case CREATE:
+                                                    send = createDis(document, send);
+                                                    break;
+                                                case ANSWER:
+                                                    send = answer(document, send);
+                                                    break;
+                                                case GET_TICKETS:
+                                                    send.append("error", "wrong action");
+                                                    break;
+                                                case GET_TICKET:
+                                                    send = getTicket(document);
+                                                    break;
+                                            }
                                             break;
                                         case ANYTHING:
+                                            switch (supportAction) {
+                                                case CREATE:
+                                                    send = createAny(document, send);
+                                                    break;
+                                                case ANSWER:
+                                                    send = answer(document, send);
+                                                    break;
+                                                case GET_TICKETS:
+                                                    send.append("error", "wrong action");
+                                                    break;
+                                                case GET_TICKET:
+                                                    send = getTicket(document);
+                                                    break;
+                                            }
                                             break;
                                     }
 
@@ -192,29 +241,67 @@ public class SocketService {
     }
 
     private Document createMC(Document document, Document send) {
-        int ticketId = this.minecraftTable.count() + 1;
-        String creator = document.getString("creator");
-        String topic = document.getString("topic");
-        String version = document.getString("mcv");
-        String serverId = document.getString("sid");
-        String subject = document.getString("subject");
-        String msg = document.getString("msg");
+        int ticketId = this.database.getTicketsTable().count() + 1;
 
-
-        if (this.database.createMinecraftTicket(ticketId, creator, topic, version, serverId, subject, msg)) {
+        if (this.database.createMinecraftTicket(ticketId, document.getString("creator"), document.getString("topic"),
+                document.getString("mcv"), document.getString("sid"), document.getString("subject"), document.getString("msg"))) {
             send.append("id", ticketId);
         } else {
-            send.append("error", "createMinecraftTicket()");
+            send.append("error", "createMC()");
         }
 
         return send;
     }
 
-    private Document changeStateMC(Document document, Document send) {
+    private Document createWeb(Document document, Document send) {
+        int ticketId = this.database.getTicketsTable().count() + 1;
+
+        if (this.database.createWebsiteTicket(ticketId, document.getString("creator"), document.getString("topic"),
+                document.getString("url"), document.getString("subject"), document.getString("msg"))) {
+            send.append("id", ticketId);
+        } else {
+            send.append("error", "createWeb()");
+        }
+
         return send;
     }
 
-    private Document answerMC(Document document, Document send) {
+    private Document createTs(Document document, Document send) {
+        int ticketId = this.database.getTicketsTable().count() + 1;
+
+        if (this.database.createTeamspeakTicket(ticketId, document.getString("creator"), document.getString("topic"),
+                document.getString("name"), document.getString("uid"), document.getString("subject"), document.getString("msg"))) {
+            send.append("id", ticketId);
+        } else {
+            send.append("error", "createTs()");
+        }
+
+        return send;
+    }
+
+    private Document createDis(Document document, Document send) {
+        int ticketId = this.database.getTicketsTable().count() + 1;
+
+        if (this.database.createDiscordTicket(ticketId, document.getString("creator"), document.getString("topic"),
+                document.getString("name"), document.getString("channel"), document.getString("subject"), document.getString("msg"))) {
+            send.append("id", ticketId);
+        } else {
+            send.append("error", "createDis()");
+        }
+
+        return send;
+    }
+
+    private Document createAny(Document document, Document send) {
+        int ticketId = this.database.getTicketsTable().count() + 1;
+
+        if (this.database.createAnythingTicket(ticketId, document.getString("creator"), document.getString("topic"),
+                document.getString("subject"), document.getString("msg"))) {
+            send.append("id", ticketId);
+        } else {
+            send.append("error", "createAny()");
+        }
+
         return send;
     }
 }
