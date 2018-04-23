@@ -54,9 +54,8 @@ public class SocketService {
                         String target = bufferedReader.readLine();
                         logger.info("[S " + client.getInetAddress() + ":" + client.getPort() + "] " + target);
 
-                        Document document = Document.parse(target);
-
                         backend.runDocumentCallbackAsync((send) -> {
+                            Document document = Document.parse(target);
 
                             switch (document.getString("service")) {
                                 case "support":
