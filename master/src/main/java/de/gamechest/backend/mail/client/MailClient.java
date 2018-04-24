@@ -7,6 +7,8 @@ import org.simplejavamail.mailer.Mailer;
 import org.simplejavamail.mailer.MailerBuilder;
 import org.simplejavamail.mailer.config.TransportStrategy;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -19,6 +21,7 @@ public class MailClient {
 
     private final String privateKeyData;
     private final Mailer mailer;
+    private final String fromAddress;
 
     public MailClient(String privateKeyData, String host, String user, String password) {
         this.privateKeyData = privateKeyData;
@@ -30,6 +33,7 @@ public class MailClient {
                 .withProperty("mail.smtp.sendpartial", "true")
                 .withDebugLogging(true)
                 .buildMailer();
+        this.fromAddress = user;
     }
 
     public boolean sendRegisterMail(String mail, String user, String verifyCode) {
@@ -68,14 +72,19 @@ public class MailClient {
 //    }
 
     private void sendMail(String mail, String user, String subject, String html) {
-        Email email = EmailBuilder.startingBlank()
-                .to(user, mail)
-                .withReplyTo("GameChest", "gamechestmc@gmail.com")
-                .withSubject(subject)
-                .withHTMLText(html)
-                .signWithDomainKey(privateKeyData, "bytelist.de", "apr2018")
-                .buildEmail();
+        try {
+            Email email = EmailBuilder.startingBlank()
+                    .to(user, mail)
+                    .from("GameChest", new InternetAddress(fromAddress))
+                    .withReplyTo("GameChest", "gamechestmc@gmail.com")
+                    .withSubject(subject)
+                    .withHTMLText(html)
+                    .signWithDomainKey(privateKeyData, "bytelist.de", "apr2018")
+                    .buildEmail();
+            this.mailer.sendMail(email, true);
+        } catch (AddressException e) {
+            e.printStackTrace();
+        }
 
-        this.mailer.sendMail(email, true);
     }
 }
