@@ -1,15 +1,14 @@
 package de.gamechest.backend.mail.client;
 
 import com.google.common.io.Resources;
+import org.simplejavamail.email.Email;
+import org.simplejavamail.email.EmailBuilder;
+import org.simplejavamail.mailer.Mailer;
+import org.simplejavamail.mailer.MailerBuilder;
+import org.simplejavamail.mailer.config.TransportStrategy;
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.Date;
-import java.util.Properties;
 
 /**
  * Created by ByteList on 08.03.2018.
@@ -18,82 +17,65 @@ import java.util.Properties;
  */
 public class MailClient {
 
-    private final String fromAddress;
-    private final Properties properties;
-    private final Session session;
+    private final String privateKeyData;
+    private final Mailer mailer;
 
-    public MailClient(String sender, String host, String user, String password) {
-        this.fromAddress = sender;
-        this.properties = System.getProperties();
-        this.properties.setProperty("mail.smtp.host", host);
-        this.properties.setProperty("mail.smtp.auth", "true");
-        this.session = Session.getDefaultInstance(properties, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(user, password);
-            }
-        });
-    }
-
-    public void sendTestMail() {
-        try {
-            String content = Resources.toString(Resources.getResource("mails/register.html"), Charset.forName("UTF-8"))
-                    .replace("#{user.name}", "ByteList").replace("#{user.verifyUrl}", "https://game-chest.de/register.php?mail=bla");
-            sendHtmlMail("Registrierung auf game-chest.de", content, "mail@bytelist.de");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public MailClient(String privateKeyData, String host, String user, String password) {
+        this.privateKeyData = privateKeyData;
+        this.mailer = MailerBuilder
+                .withSMTPServer(host, 587, user, password)
+                .withTransportStrategy(TransportStrategy.SMTP_TLS)
+                .withSessionTimeout(10 * 1000)
+                .clearEmailAddressCriteria()
+                .withProperty("mail.smtp.sendpartial", "true")
+                .withDebugLogging(true)
+                .buildMailer();
     }
 
     public boolean sendRegisterMail(String mail, String user, String verifyCode) {
         try {
             String content = Resources.toString(Resources.getResource("mails/register.html"), Charset.forName("UTF-8"))
                     .replace("#{user.name}", user).replace("#{user.verifyUrl}", "https://game-chest.de/register/"+verifyCode+"/");
-            return sendHtmlMail("Registrierung auf game-chest.de", content, mail);
+//            return sendHtmlMail("Registrierung auf game-chest.de", content, mail);
+            sendMail(mail, user, "Registrierung auf game-chest.de", content);
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    public void sendMail(String subject, String text, String toAddress) {
-        try {
-            MimeMessage message = new MimeMessage(session);
+//    private boolean sendHtmlMail(String subject, Object content, String toAddress) {
+//        try {
+//            MimeMessage message = new MimeMessage(session);
+//
+//            message.setFrom(new InternetAddress(fromAddress, "GameChest"));
+//            message.setSender(new InternetAddress("bytelist.de"));
+//            message.setSentDate(new Date());
+//
+//            message.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
+//
+//            message.setSubject(subject);
+//            message.setContent(content, "text/html");
+//
+//            Transport.send(message);
+//            System.out.println("[Mail] Sent mail to "+toAddress+": "+subject);
+//            return true;
+//        } catch (MessagingException | UnsupportedEncodingException ex) {
+//            ex.printStackTrace();
+//        }
+//        return false;
+//    }
 
-            message.setFrom(new InternetAddress(fromAddress));
-            message.setSender(new InternetAddress(fromAddress));
+    private void sendMail(String mail, String user, String subject, String html) {
+        Email email = EmailBuilder.startingBlank()
+                .to(user, mail)
+                .withReplyTo("GameChest", "gamechestmc@gmail.com")
+                .withSubject(subject)
+                .withHTMLText(html)
+                .signWithDomainKey(privateKeyData, "somemail.com", "selector")
+                .buildEmail();
 
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
-
-            message.setSubject(subject);
-            message.setText(text);
-
-            Transport.send(message);
-            System.out.println("[Mail] Sent mail to "+toAddress+": "+subject);
-        } catch (MessagingException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private boolean sendHtmlMail(String subject, Object content, String toAddress) {
-        try {
-            MimeMessage message = new MimeMessage(session);
-
-            message.setFrom(new InternetAddress(fromAddress, "GameChest"));
-            message.setSender(new InternetAddress("bytelist.de"));
-            message.setSentDate(new Date());
-
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
-
-            message.setSubject(subject);
-            message.setContent(content, "text/html");
-
-            Transport.send(message);
-            System.out.println("[Mail] Sent mail to "+toAddress+": "+subject);
-            return true;
-        } catch (MessagingException | UnsupportedEncodingException ex) {
-            ex.printStackTrace();
-        }
-        return false;
+        this.mailer.sendMail(email, true);
     }
 }

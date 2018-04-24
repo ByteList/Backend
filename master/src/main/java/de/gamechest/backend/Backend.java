@@ -4,15 +4,14 @@ import de.gamechest.backend.config.Document;
 import de.gamechest.backend.console.CommandHandler;
 import de.gamechest.backend.console.commands.EndCommand;
 import de.gamechest.backend.console.commands.HelpCommand;
-import de.gamechest.backend.console.commands.MailTestCommand;
 import de.gamechest.backend.database.DatabaseManager;
 import de.gamechest.backend.log.BackendLogger;
 import de.gamechest.backend.log.LoggingOutPutStream;
 import de.gamechest.backend.mail.client.MailClient;
 import de.gamechest.backend.setup.Setup;
+import de.gamechest.backend.socket.SocketService;
 import de.gamechest.backend.updater.Updater;
 import de.gamechest.backend.web.WebService;
-import de.gamechest.backend.socket.SocketService;
 import jline.console.ConsoleReader;
 import lombok.Getter;
 import lombok.Setter;
@@ -126,7 +125,7 @@ public class Backend {
 
         this.webService = new WebService(logger, backendDocument.getInt("web-port"), backendDocument.getBoolean("web-access-local"));
 
-        this.mailClient = new MailClient(backendDocument.getString("mail-sender"), backendDocument.getString("mail-host"),
+        this.mailClient = new MailClient(backendDocument.getString("mail-private-key"), backendDocument.getString("mail-host"),
                 backendDocument.getString("mail-user"), backendDocument.getString("mail-password"));
 
         this.socketService = new SocketService(logger, backendDocument.getInt("socket-port"), backendDocument.getBoolean("socket-access-local"));
@@ -135,7 +134,6 @@ public class Backend {
 
         this.commandHandler.registerCommand(new EndCommand());
         this.commandHandler.registerCommand(new HelpCommand());
-        this.commandHandler.registerCommand(new MailTestCommand());
 
         this.executorService = Executors.newCachedThreadPool();
     }
