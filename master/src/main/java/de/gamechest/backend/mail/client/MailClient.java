@@ -81,7 +81,7 @@ public class MailClient {
                     .withHTMLText(html)
                     .signWithDomainKey(privateKeyData, "bytelist.de", "apr2018")
                     .buildEmail();
-            this.mailer.sendMail(email, true);
+            this.mailer.sendMail(email);
         } catch (AddressException e) {
             e.printStackTrace();
         }
