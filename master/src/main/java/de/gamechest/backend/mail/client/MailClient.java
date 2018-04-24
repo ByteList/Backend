@@ -55,7 +55,7 @@ public class MailClient {
                     .withReplyTo("GameChest", "gamechestmc@gmail.com")
                     .withSubject(subject)
                     .withHTMLText(html)
-                    .signWithDomainKey(privateKeyData, "bytelist.de", "apr2018")
+                    .signWithDomainKey(privateKeyData, "bytelist.de", "apr2018.bytelist")
                     .buildEmail();
             this.mailer.sendMail(email);
             return true;
