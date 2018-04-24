@@ -29,10 +29,6 @@ public class MailClient {
         this.mailer = MailerBuilder
                 .withSMTPServer(host, 587, user, password)
                 .withTransportStrategy(TransportStrategy.SMTP_TLS)
-                .withSessionTimeout(10 * 1000)
-                .clearEmailAddressCriteria()
-                .withProperty("mail.smtp.sendpartial", "true")
-                .withDebugLogging(true)
                 .buildMailer();
         this.fromAddress = user;
     }
