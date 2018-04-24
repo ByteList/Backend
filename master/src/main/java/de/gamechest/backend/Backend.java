@@ -125,7 +125,7 @@ public class Backend {
 
         this.webService = new WebService(logger, backendDocument.getInt("web-port"), backendDocument.getBoolean("web-access-local"));
 
-        this.mailClient = new MailClient(backendDocument.getString("mail-private-key"), backendDocument.getString("mail-host"),
+        this.mailClient = new MailClient(new File(backendDocument.getString("mail-private-key-file")), backendDocument.getString("mail-host"),
                 backendDocument.getString("mail-user"), backendDocument.getString("mail-password"));
 
         this.socketService = new SocketService(logger, backendDocument.getInt("socket-port"), backendDocument.getBoolean("socket-access-local"));

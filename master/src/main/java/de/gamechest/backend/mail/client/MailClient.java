@@ -9,6 +9,7 @@ import org.simplejavamail.mailer.config.TransportStrategy;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -19,11 +20,11 @@ import java.nio.charset.Charset;
  */
 public class MailClient {
 
-    private final String privateKeyData;
+    private final File privateKeyData;
     private final Mailer mailer;
     private final String fromAddress;
 
-    public MailClient(String privateKeyData, String host, String user, String password) {
+    public MailClient(File privateKeyData, String host, String user, String password) {
         this.privateKeyData = privateKeyData;
         this.mailer = MailerBuilder
                 .withSMTPServer(host, 587, user, password)
