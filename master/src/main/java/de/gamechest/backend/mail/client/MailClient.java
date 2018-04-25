@@ -63,7 +63,7 @@ public class MailClient {
 
             for (Character c : con) {
                 if(!c.toString().startsWith("---")) {
-                    keyAsStr.append(c).append("\n");
+                    keyAsStr.append(c);
                 }
             }
 
