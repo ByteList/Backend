@@ -1,6 +1,7 @@
 package de.gamechest.backend.mail.client;
 
 import com.google.common.io.Resources;
+import de.gamechest.backend.Backend;
 import org.simplejavamail.email.Email;
 import org.simplejavamail.email.EmailBuilder;
 import org.simplejavamail.mailer.Mailer;
@@ -16,6 +17,7 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 
 /**
  * Created by ByteList on 08.03.2018.
@@ -36,41 +38,49 @@ public class MailClient {
                 .buildMailer();
         this.fromAddress = user;
 
-        StringBuilder keyAsStr = new StringBuilder();
-        FileInputStream fileInputStream = null;
-        try {
-            fileInputStream = new FileInputStream(privateKeyData);
-
-            int content;
-            while ((content = fileInputStream.read()) != -1) {
-                keyAsStr .append((char) content);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
+        Backend.getInstance().runAsync(()-> {
+            ArrayList<Character> con = new ArrayList<>();
+            StringBuilder keyAsStr = new StringBuilder();
+            FileInputStream fileInputStream = null;
             try {
-                if (fileInputStream != null) {
-                    fileInputStream.close();
+                fileInputStream = new FileInputStream(this.privateKeyData);
+
+                int content;
+                while ((content = fileInputStream.read()) != -1) {
+                    con.add((char) content);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    if (fileInputStream != null) {
+                        fileInputStream.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
 
-        byte[] key = DatatypeConverter.parseHexBinary(keyAsStr.toString());
+            for (Character c : con) {
+                if(!c.toString().startsWith("---")) {
+                    keyAsStr.append(c).append("\n");
+                }
+            }
 
-        try {
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(key);
+            byte[] key = DatatypeConverter.parseHexBinary(keyAsStr.toString());
+
             try {
-                keyFactory.generatePublic(publicKeySpec);
-            } catch (InvalidKeySpecException e) {
+                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(key);
+                try {
+                    keyFactory.generatePublic(publicKeySpec);
+                } catch (InvalidKeySpecException e) {
+                    e.printStackTrace();
+                }
+            } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
+        });
     }
 
     public boolean sendRegisterMail(String mail, String user, String verifyCode) {
