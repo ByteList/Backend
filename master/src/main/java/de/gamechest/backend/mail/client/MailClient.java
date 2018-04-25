@@ -17,7 +17,7 @@ import java.nio.charset.Charset;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 /**
  * Created by ByteList on 08.03.2018.
@@ -63,7 +63,7 @@ public class MailClient {
 
             try {
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key);
+                PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key);
                 try {
                     this.privateKeyData = keyFactory.generatePrivate(keySpec).getEncoded();
                 } catch (InvalidKeySpecException e) {
