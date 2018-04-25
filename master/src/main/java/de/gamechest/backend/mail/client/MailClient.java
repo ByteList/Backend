@@ -26,11 +26,11 @@ public class MailClient {
 
     public MailClient(File privateKeyFile, String host, String user, String password) {
         this.privateKeyData = privateKeyFile;
+        this.fromAddress = user;
         this.mailer = MailerBuilder
                 .withSMTPServer(host, 587, user, password)
                 .withTransportStrategy(TransportStrategy.SMTP)
                 .buildMailer();
-        this.fromAddress = user;
     }
 
     public boolean sendRegisterMail(String mail, String user, String verifyCode) {
@@ -47,12 +47,11 @@ public class MailClient {
     private boolean sendMail(String mail, String user, String subject, String html) {
         try {
             Email email = EmailBuilder.startingBlank()
-                    .signWithDomainKey(privateKeyData, "bytelist.de", "gc02.bytelist")
-                    .withHeader("sender", "bytelist.de")
                     .to(user, mail)
                     .from("Game-Chest.de Netzwerk", new InternetAddress(this.fromAddress))
                     .withSubject(subject)
                     .withHTMLText(html)
+                    .signWithDomainKey(privateKeyData, "bytelist.de", "gc02.bytelist")
                     .buildEmail();
             this.mailer.sendMail(email);
             System.out.println("[Mail] Sent to "+user+" : "+mail+" / "+subject);
