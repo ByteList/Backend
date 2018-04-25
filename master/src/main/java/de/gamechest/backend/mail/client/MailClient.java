@@ -92,7 +92,7 @@ public class MailClient {
                     .withReplyTo("GameChest", "gamechestmc@gmail.com")
                     .withSubject(subject)
                     .withHTMLText(html)
-                    .signWithDomainKey(privateKeyData, "bytelist.de", "apr2018.bytelist")
+                    .signWithDomainKey(privateKeyData, "bytelist.de", "1524585446.bytelist")
                     .buildEmail();
             this.mailer.sendMail(email);
             return true;
