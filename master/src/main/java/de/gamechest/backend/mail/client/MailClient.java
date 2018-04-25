@@ -51,7 +51,7 @@ public class MailClient {
                     .from("Game-Chest.de Netzwerk", new InternetAddress(this.fromAddress))
                     .withSubject(subject)
                     .withHTMLText(html)
-                    .signWithDomainKey(privateKeyData, "bytelist.de", "1524585446.bytelist")
+                    .signWithDomainKey(privateKeyData, "bytelist.de", "1524668374.bytelist")
                     .buildEmail();
             this.mailer.sendMail(email);
             System.out.println("[Mail] Sent to "+user+" : "+mail+" / "+subject);
