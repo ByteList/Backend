@@ -10,14 +10,14 @@ import org.simplejavamail.mailer.config.TransportStrategy;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import javax.xml.bind.DatatypeConverter;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
 
 /**
  * Created by ByteList on 08.03.2018.
@@ -39,7 +39,6 @@ public class MailClient {
         this.fromAddress = user;
 
         Backend.getInstance().runAsync(()-> {
-            ArrayList<Character> con = new ArrayList<>();
             StringBuilder keyAsStr = new StringBuilder();
             FileInputStream fileInputStream = null;
             try {
@@ -47,7 +46,7 @@ public class MailClient {
 
                 int content;
                 while ((content = fileInputStream.read()) != -1) {
-                    con.add((char) content);
+                    keyAsStr.append((char) content);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -61,13 +60,7 @@ public class MailClient {
                 }
             }
 
-            for (Character c : con) {
-                if(!c.toString().startsWith("---")) {
-                    keyAsStr.append(c);
-                }
-            }
-
-            byte[] key = DatatypeConverter.parseHexBinary(keyAsStr.toString());
+            byte[] key = keyAsStr.toString().getBytes();
 
             try {
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
