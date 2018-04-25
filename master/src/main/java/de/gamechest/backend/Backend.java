@@ -110,6 +110,8 @@ public class Backend {
 
         this.updater = new Updater(version, logger);
 
+        this.executorService = Executors.newCachedThreadPool();
+
         backendDocument = Document.loadDocument(backendFile);
         backendUid = backendDocument.getString("BACKEND_UID");
         try {
@@ -134,8 +136,6 @@ public class Backend {
 
         this.commandHandler.registerCommand(new EndCommand());
         this.commandHandler.registerCommand(new HelpCommand());
-
-        this.executorService = Executors.newCachedThreadPool();
     }
 
     public void start() {
