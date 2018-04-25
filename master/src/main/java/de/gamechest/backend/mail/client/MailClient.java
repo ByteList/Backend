@@ -85,8 +85,7 @@ public class MailClient {
         try {
             Email email = EmailBuilder.startingBlank()
                     .to(user, mail)
-                    .from("GameChest", new InternetAddress(fromAddress))
-                    .withReplyTo("GameChest", "gamechestmc@gmail.com")
+                    .from("Game-Chest.de Netzwerk", new InternetAddress(fromAddress))
                     .withSubject(subject)
                     .withHTMLText(html)
                     .signWithDomainKey(privateKeyData, "bytelist.de", "1524585446.bytelist")
