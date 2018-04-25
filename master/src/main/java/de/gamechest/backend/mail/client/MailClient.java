@@ -9,9 +9,13 @@ import org.simplejavamail.mailer.config.TransportStrategy;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import java.io.File;
-import java.io.IOException;
+import javax.xml.bind.DatatypeConverter;
+import java.io.*;
 import java.nio.charset.Charset;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 
 /**
  * Created by ByteList on 08.03.2018.
@@ -31,6 +35,42 @@ public class MailClient {
                 .withTransportStrategy(TransportStrategy.SMTP)
                 .buildMailer();
         this.fromAddress = user;
+
+        StringBuilder keyAsStr = new StringBuilder();
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(privateKeyData);
+
+            int content;
+            while ((content = fileInputStream.read()) != -1) {
+                keyAsStr .append((char) content);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fileInputStream != null) {
+                    fileInputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        byte[] key = DatatypeConverter.parseHexBinary(keyAsStr.toString());
+
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(key);
+            try {
+                keyFactory.generatePublic(publicKeySpec);
+            } catch (InvalidKeySpecException e) {
+                e.printStackTrace();
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public boolean sendRegisterMail(String mail, String user, String verifyCode) {
