@@ -26,12 +26,11 @@ import java.security.spec.X509EncodedKeySpec;
  */
 public class MailClient {
 
-    private final File privateKeyData;
+    private byte[] privateKeyData;
     private final Mailer mailer;
     private final String fromAddress;
 
-    public MailClient(File privateKeyData, String host, String user, String password) {
-        this.privateKeyData = privateKeyData;
+    public MailClient(File privateKeyFile, String host, String user, String password) {
         this.mailer = MailerBuilder
                 .withSMTPServer(host, 587, user, password)
                 .withTransportStrategy(TransportStrategy.SMTP)
@@ -42,7 +41,7 @@ public class MailClient {
             StringBuilder keyAsStr = new StringBuilder();
             FileInputStream fileInputStream = null;
             try {
-                fileInputStream = new FileInputStream(this.privateKeyData);
+                fileInputStream = new FileInputStream(privateKeyFile);
 
                 int content;
                 while ((content = fileInputStream.read()) != -1) {
@@ -64,9 +63,9 @@ public class MailClient {
 
             try {
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(key);
+                X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key);
                 try {
-                    keyFactory.generatePublic(publicKeySpec);
+                    this.privateKeyData = keyFactory.generatePrivate(keySpec).getEncoded();
                 } catch (InvalidKeySpecException e) {
                     e.printStackTrace();
                 }
