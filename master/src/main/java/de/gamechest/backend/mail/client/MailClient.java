@@ -47,7 +47,7 @@ public class MailClient {
     private boolean sendMail(String mail, String user, String subject, String html) {
         try {
             Email email = EmailBuilder.startingBlank()
-                    .signWithDomainKey(privateKeyData, "bytelist.de", "gc01.bytelist")
+                    .signWithDomainKey(privateKeyData, "bytelist.de", "gc02.bytelist")
                     .withHeader("sender", "bytelist.de")
                     .to(user, mail)
                     .from("Game-Chest.de Netzwerk", new InternetAddress(this.fromAddress))
