@@ -28,7 +28,7 @@ public class MailClient {
         this.privateKeyData = privateKeyFile;
         this.mailer = MailerBuilder
                 .withSMTPServer(host, 587, user, password)
-                .withTransportStrategy(TransportStrategy.SMTPS)
+                .withTransportStrategy(TransportStrategy.SMTP)
                 .buildMailer();
         this.fromAddress = user;
     }
@@ -48,7 +48,7 @@ public class MailClient {
         try {
             Email email = EmailBuilder.startingBlank()
                     .to(user, mail)
-                    .from("Game-Chest.de Netzwerk", new InternetAddress(fromAddress))
+                    .from("Game-Chest.de Netzwerk", new InternetAddress(this.fromAddress))
                     .withSubject(subject)
                     .withHTMLText(html)
                     .signWithDomainKey(privateKeyData, "bytelist.de", "1524585446.bytelist")
