@@ -31,43 +31,6 @@ public class MailClient {
                 .withTransportStrategy(TransportStrategy.SMTP)
                 .buildMailer();
         this.fromAddress = user;
-
-//        Backend.getInstance().runAsync(()-> {
-//            StringBuilder keyAsStr = new StringBuilder();
-//            FileInputStream fileInputStream = null;
-//            try {
-//                fileInputStream = new FileInputStream(privateKeyFile);
-//
-//                int content;
-//                while ((content = fileInputStream.read()) != -1) {
-//                    keyAsStr.append((char) content);
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            } finally {
-//                try {
-//                    if (fileInputStream != null) {
-//                        fileInputStream.close();
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            byte[] key = keyAsStr.toString().getBytes();
-//
-//            try {
-//                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-//                PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key);
-//                try {
-//                    this.privateKeyData = keyFactory.generatePrivate(keySpec).getEncoded();
-//                } catch (InvalidKeySpecException e) {
-//                    e.printStackTrace();
-//                }
-//            } catch (NoSuchAlgorithmException e) {
-//                e.printStackTrace();
-//            }
-//        });
     }
 
     public boolean sendRegisterMail(String mail, String user, String verifyCode) {
@@ -91,6 +54,7 @@ public class MailClient {
                     .signWithDomainKey(privateKeyData, "bytelist.de", "1524585446.bytelist")
                     .buildEmail();
             this.mailer.sendMail(email);
+            System.out.println("[Mail] Sent to "+user+" : "+mail+" / "+subject);
             return true;
         } catch (AddressException e) {
             e.printStackTrace();
