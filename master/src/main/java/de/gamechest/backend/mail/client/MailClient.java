@@ -28,7 +28,7 @@ public class MailClient {
         this.privateKeyData = privateKeyFile;
         this.mailer = MailerBuilder
                 .withSMTPServer(host, 587, user, password)
-                .withTransportStrategy(TransportStrategy.SMTP_TLS)
+                .withTransportStrategy(TransportStrategy.SMTPS)
                 .buildMailer();
         this.fromAddress = user;
     }
