@@ -225,7 +225,7 @@ public class Backend {
         this.executorService.execute(runnable);
     }
 
-    public void runDocumentCallbackAsync( Callback<org.bson.Document> callback) {
+    public void runDocumentCallbackAsync(Callback<org.bson.Document> callback) {
         runAsync(()-> callback.run(new org.bson.Document()));
     }
 }

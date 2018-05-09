@@ -29,6 +29,7 @@ public class TicketsTable implements SqlLiteTable {
                 .append("ticket_id")
                 .append("tab")
                 .append("creator")
+                .append("notify")
                 .append("state").create();
 
         database.executeUpdate("CREATE TABLE IF NOT EXISTS "+name+" "+structure.toStatementFormattedString());
@@ -54,13 +55,33 @@ public class TicketsTable implements SqlLiteTable {
         return count;
     }
 
+    public int countNotify(String creator, String notifyValue) {
+        ResultSet resultSet = this.database.executeQuery("SELECT COUNT(notify) AS rowcount FROM "+this.name+" WHERE creator = '"+creator+"' AND notify = '"+notifyValue+"'");
+        int count = -1;
+        try {
+            while (resultSet.next()) {
+                count = resultSet.getInt("rowcount");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return count;
+    }
+
     public String insert(int ticketId, String tab, String creator, String state) {
         String structure = this.structure.toValuesFormattedString();
         structure = structure
                 .replace("ticket_id", String.valueOf(ticketId))
                 .replace("tab", tab)
                 .replace("creator", creator)
-                .replace("state", state);
+                .replace("state", state)
+                .replace("notify", "0");
 
         return "INSERT INTO "+this.name+" VALUES"+structure;
     }
@@ -83,5 +104,9 @@ public class TicketsTable implements SqlLiteTable {
 
     public String updateState(int ticketId, String state) {
         return "UPDATE "+this.name+" SET state = '"+state+"' WHERE ticket_id = '"+ticketId+"';";
+    }
+
+    public String updateNotify(int ticketId, String value) {
+        return "UPDATE "+this.name+" SET notify = '"+value+"' WHERE ticket_id = '"+ticketId+"';";
     }
 }

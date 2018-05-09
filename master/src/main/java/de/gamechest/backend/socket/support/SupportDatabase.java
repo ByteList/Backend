@@ -279,7 +279,7 @@ public class SupportDatabase extends SqlLiteDatabase {
         return document;
     }
 
-    public Document getTicket(int ticketId) {
+    public Document getTicket(int ticketId, String sender) {
         Document document = new Document();
         String cmd = this.ticketsTable.selectTicket(ticketId);
         ResultSet resultSet = this.executeQuery(cmd);
@@ -287,10 +287,19 @@ public class SupportDatabase extends SqlLiteDatabase {
         try {
             while (resultSet.next()) {
                 String tab = resultSet.getString("tab");
+                String notify = resultSet.getString("notify");
+                String creator = resultSet.getString("creator");
+
+                if(notify.equals("1") && creator.equals(sender)) {
+                    if(this.executeUpdate(this.ticketsTable.updateNotify(ticketId, "0"))) {
+                        notify = "0";
+                    }
+                }
 
                 document.append("id", ticketId);
                 document.append("state", resultSet.getString("state"));
-                document.append("creator", resultSet.getString("creator"));
+                document.append("creator", creator);
+                document.append("notify", notify);
                 document.append("tab", tab);
                 ArrayList<Document> answers = new ArrayList<>();
 
@@ -387,6 +396,7 @@ public class SupportDatabase extends SqlLiteDatabase {
             String stateUpdateCmd = this.ticketsTable.updateState(ticketId, SupportState.IN_PROGRESSING.getStateString());
             String stateUpdateAnswerCmd = this.answersTable.insert(ticketId, "system", "state:"+SupportState.IN_PROGRESSING.getStateString());
 
+
             switch (supportState) {
                 case OPEN:
                     this.executeUpdate(stateUpdateCmd);
@@ -401,7 +411,18 @@ public class SupportDatabase extends SqlLiteDatabase {
             }
         }
 
-        String mcAnswersCmd = this.answersTable.insert(ticketId, user, msg);
-        return this.executeUpdate(mcAnswersCmd);
+        String answersCmd = this.answersTable.insert(ticketId, user, msg);
+        String notifyCmd = this.ticketsTable.updateNotify(ticketId, "1");
+
+        return this.executeUpdate(answersCmd) && this.executeUpdate(notifyCmd);
+    }
+
+    public Document getNotify(String user, String notifyValue) {
+        Document document = new Document();
+
+        document.append("user", user);
+        document.append("notifyCount", this.ticketsTable.countNotify(user, notifyValue));
+
+        return document;
     }
 }

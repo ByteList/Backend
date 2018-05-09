@@ -76,6 +76,8 @@ public class SocketService {
                                                 case GET_TICKETS:
                                                     if(document.containsKey("tickets_state")) {
                                                         send = getTicketsFromState(document, send);
+                                                    } else if(document.containsKey("notify_value")) {
+                                                        send = getNotifyCount(document);
                                                     } else {
                                                         send = getTicketsDefault(document, send);
                                                     }
@@ -220,9 +222,17 @@ public class SocketService {
         return send;
     }
 
+    private Document getNotifyCount(Document document) {
+        String user = document.getString("user");
+        String notifyValue = document.getString("notify_value");
+
+        return this.database.getNotify(user, notifyValue);
+    }
+
     private Document getTicket(Document document) {
         int ticketId = Integer.valueOf(document.getString("ticket_id"));
-        return this.database.getTicket(ticketId);
+        String sender = document.getString("sender");
+        return this.database.getTicket(ticketId, sender);
     }
 
     private Document answer(Document document, Document send) {
