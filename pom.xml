@@ -28,7 +28,7 @@
     <repositories>
         <repository>
             <id>byte-repo</id>
-            <url>https://vs.bytelist.de/nexus/repository/byte-repo/</url>
+            <url>https://kvm.bytelist.de/nexus/repository/byte-repo/</url>
         </repository>
     </repositories>
 
@@ -50,7 +50,7 @@
     <distributionManagement>
         <repository>
             <id>byte-repo</id>
-            <url>https://vs.bytelist.de/nexus/repository/byte-repo/</url>
+            <url>https://kvm.bytelist.de/nexus/repository/byte-repo/</url>
         </repository>
     </distributionManagement>
 
@@ -85,7 +85,7 @@
                 </executions>
                 <configuration>
                     <serverId>byte-repo</serverId>
-                    <nexusUrl>https://vs.bytelist.de/nexus/</nexusUrl>
+                    <nexusUrl>https://kvm.bytelist.de/nexus/</nexusUrl>
                     <skipStaging>true</skipStaging>
                 </configuration>
             </plugin>
