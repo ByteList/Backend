@@ -56,6 +56,8 @@ public class WebService {
     private final String METHOD_OPTIONS = "OPTIONS";
     private final String ALLOWED_METHODS = METHOD_GET + "," + METHOD_OPTIONS;
 
+    private final boolean CACHE_ENABLED = false;
+
     private final HashMap<String, Cached<Document>> findCache = new HashMap<>();
 
     public WebService(BackendLogger logger, int port, boolean local) {
@@ -123,7 +125,7 @@ public class WebService {
                                             int id = Integer.parseInt(dbId);
                                             String url = httpExchange.getRequestURI().toString();
 
-                                            if(findCache.containsKey(url)) {
+                                            if(canCache(url) && findCache.containsKey(url)) {
                                                 first = findCache.get(url).getCached();
                                                 logger.info("[W "+httpExchange.getRemoteAddress().toString()+" | cached] "+httpExchange.getRequestURI().toString());
                                             } else {
@@ -273,5 +275,11 @@ public class WebService {
         } catch (final UnsupportedEncodingException ex) {
             throw new InternalError(ex);
         }
+    }
+
+    private boolean canCache(String url) {
+        if(!CACHE_ENABLED) return false;
+
+        return !url.contains("session");
     }
 }
