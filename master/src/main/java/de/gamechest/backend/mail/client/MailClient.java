@@ -24,11 +24,11 @@ public class MailClient {
     private final Mailer mailer;
     private final String fromAddress;
 
-    public MailClient(File privateKeyFile, String host, String user, String password) {
+    public MailClient(File privateKeyFile, String host, int port, String user, String password) {
         this.privateKeyData = privateKeyFile;
         this.fromAddress = user;
         this.mailer = MailerBuilder
-                .withSMTPServer(host, 587, user, password)
+                .withSMTPServer(host, port, user, password)
                 .withTransportStrategy(TransportStrategy.SMTP)
                 .buildMailer();
     }
@@ -36,7 +36,7 @@ public class MailClient {
     public boolean sendRegisterMail(String mail, String user, String verifyCode) {
         try {
             String content = Resources.toString(Resources.getResource("mails/register.html"), Charset.forName("UTF-8"))
-                    .replace("#{user.name}", user).replace("#{user.verifyUrl}", "https://game-chest.de/register/"+verifyCode+"/");
+                    .replace("#{user.name}", user).replace("#{user.verifyUrl}", "https://game-chest.de/?Register/"+verifyCode+"/");
             return sendMail(mail, user, "Registrierung auf game-chest.de", content);
         } catch (IOException e) {
             e.printStackTrace();
