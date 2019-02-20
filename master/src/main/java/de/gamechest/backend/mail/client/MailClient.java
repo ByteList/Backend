@@ -48,10 +48,10 @@ public class MailClient {
         try {
             Email email = EmailBuilder.startingBlank()
                     .to(user, mail)
-                    .from("Game-Chest.de Netzwerk", new InternetAddress(this.fromAddress))
+                    .from("Game-Chest.de", new InternetAddress(this.fromAddress))
                     .withSubject(subject)
                     .withHTMLText(html)
-                    .signWithDomainKey(privateKeyData, "game-chest.de", "dkim")
+                    .signWithDomainKey(privateKeyData, "bytelist.de", "dkim")
                     .buildEmail();
             this.mailer.sendMail(email);
             System.out.println("[Mail] Sent to "+user+" : "+mail+" / "+subject);
