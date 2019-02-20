@@ -53,7 +53,7 @@ public class MailClient {
                     .withHTMLText(html)
                     .signWithDomainKey(privateKeyData, "bytelist.de", "dkim")
                     .buildEmail();
-            this.mailer.sendMail(email);
+            this.mailer.sendMail(email);    // todo: look @ C:\Users\Niklas\.m2\repository\net\markenwerk\utils-mail-dkim\1.1.11\utils-mail-dkim-1.1.11.jar!\net\markenwerk\utils\mail\dkim\DkimSigner.class
             System.out.println("[Mail] Sent to "+user+" : "+mail+" / "+subject);
             return true;
         } catch (AddressException e) {
