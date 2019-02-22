@@ -50,6 +50,8 @@ public class DKIMSigner implements IDKIMSigner {
     }
 
     private void setIdentity(String address, DkimSigner dkimSigner) {
+        if(address == null || dkimSigner == null) return;
+
         Class<? extends DkimSigner> clazz = dkimSigner.getClass();
 
         try {
