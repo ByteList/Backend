@@ -52,8 +52,7 @@ public class DKIMSigner implements IDKIMSigner {
     private void setIdentity(String address, DkimSigner dkimSigner) throws IllegalAccessException, NoSuchFieldException {
         if(address == null || dkimSigner == null) return;
 
-        Class clazz = dkimSigner.getClass();
-        Field identity = clazz.getField("identity");
+        Field identity = dkimSigner.getClass().getField("identity");
         identity.setAccessible(true);
         identity.set(dkimSigner, address);
     }
