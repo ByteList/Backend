@@ -44,22 +44,17 @@ public class DKIMSigner implements IDKIMSigner {
             dkimSigner.setLengthParam(true);
             dkimSigner.setZParam(false);
             return new DkimMessage(messageToSign, dkimSigner);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | MessagingException | IOException var4) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | MessagingException | IOException | NoSuchFieldException | IllegalAccessException var4) {
             throw new MimeMessageParseException("Error signing MimeMessage with DKIM", var4);
         }
     }
 
-    private void setIdentity(String address, DkimSigner dkimSigner) {
+    private void setIdentity(String address, DkimSigner dkimSigner) throws IllegalAccessException, NoSuchFieldException {
         if(address == null || dkimSigner == null) return;
 
-        Class<? extends DkimSigner> clazz = dkimSigner.getClass();
-
-        try {
-            Field identity = clazz.getField("identity");
-            identity.setAccessible(true);
-            identity.set(dkimSigner, address);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        Class clazz = dkimSigner.getClass();
+        Field identity = clazz.getField("identity");
+        identity.setAccessible(true);
+        identity.set(dkimSigner, address);
     }
 }
