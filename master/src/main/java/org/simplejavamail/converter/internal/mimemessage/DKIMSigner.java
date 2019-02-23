@@ -52,7 +52,7 @@ public class DKIMSigner implements IDKIMSigner {
     private void setIdentity(String address, DkimSigner dkimSigner) throws IllegalAccessException, NoSuchFieldException {
         if(address == null || dkimSigner == null) return;
 
-        Field identity = dkimSigner.getClass().getField("identity");
+        Field identity = dkimSigner.getClass().getDeclaredField("identity");
         identity.setAccessible(true);
         identity.set(dkimSigner, address);
     }
