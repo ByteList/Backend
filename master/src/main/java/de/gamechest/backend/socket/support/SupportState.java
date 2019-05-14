@@ -11,6 +11,9 @@ public enum SupportState {
 
     OPEN("open"),
     IN_PROGRESSING("progressing"),
+    SECOND_SUPPORT("progressing-2"),
+    THIRD_SUPPORT("progressing-3"),
+    FOURTH_SUPPORT("progressing-4"),
     CLOSED("closed");
 
     @Getter
